@@ -5,19 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Catálogo de Juegos</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+
     <style>
-        body { font-family: Arial, sans-serif; margin-top: 50px; display: flex; }
-        .catalogo-container { flex: 1; padding: 20px; }
-        .catalogo { display: grid; grid-template-columns: repeat(6, 1fr); gap: 15px; }
-        .item { cursor: pointer; padding: 10px; border: 2px solid #ccc; border-radius: 8px; text-align: center; }
+        body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
+        .catalogo { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; margin-top: 20px; }
+        .item { width: 150px; cursor: pointer; padding: 10px; border: 2px solid #ccc; border-radius: 8px; }
         .item img { width: 100%; border-radius: 8px; }
         .selected { border-color: #007BFF; background-color: #E6F0FF; }
+        input { padding: 8px; width: 200px; margin-top: 10px; }
+        button { padding: 10px 20px; font-size: 16px; cursor: pointer; margin: 10px; }
         .header { display: flex; justify-content: space-between; align-items: center; padding: 10px; background-color: #f4f4f4; position: fixed; top: 0; width: 100%; z-index: 1000; }
-        .contador { font-size: 18px; background-color: rgba(255, 255, 255, 0.8); padding: 5px 10px; border-radius: 5px; margin-left: 20px; }
-        .seleccionados-container { width: 300px; padding: 20px; background-color: #f9f9f9; border-left: 1px solid #ccc; overflow-y: auto; height: 100vh; position: fixed; right: 0; top: 0; }
-        .seleccionados-container h3 { margin-top: 60px; }
-        .seleccionado-item { display: flex; align-items: center; justify-content: space-between; padding: 5px 0; }
-        .seleccionado-item label { flex: 1; text-align: left; }
+        .contador { font-size: 18px; background-color: rgba(255, 255, 255, 0.8); padding: 5px 10px; border-radius: 5px; }
+        .catalogo-container { margin-top: 80px; } /* Para evitar que el contenido se superponga con la cabecera */
     </style>
 </head>
 <body>
@@ -35,94 +34,112 @@
 
     <div class="catalogo-container">
         <h2>Catálogo de Juegos</h2>
+
         <div class="catalogo" id="catalogo">
             <!-- Los juegos se cargarán aquí dinámicamente -->
         </div>
     </div>
 
-    <div class="seleccionados-container">
-        <h3>Juegos Seleccionados</h3>
-        <div id="listaSeleccionados">
-            <!-- Lista de juegos seleccionados -->
-        </div>
-    </div>
-
     <!-- Formulario oculto para enviar el archivo con FormSubmit -->
-    <form id="emailForm" action="https://formsubmit.co/tu_correo@example.com" method="POST" enctype="multipart/form-data">
+    <form id="emailForm" action="https://formsubmit.co/juliodiablo1986@gmail.com" method="POST" enctype="multipart/form-data">
         <input type="hidden" name="_subject" value="Juegos Seleccionados">
         <input type="file" id="csvFile" name="attachment" hidden>
     </form>
 
     <script>
-        const seleccionados = new Set();
-
         function cargarCatalogo() {
             fetch('list.csv')
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('No se pudo cargar el archivo CSV.');
-                    }
-                    return response.text();
-                })
+                .then(response => response.text())
                 .then(data => {
-                    const juegos = data.split('\n').map(juego => juego.trim()).filter(juego => juego);
+                    let juegos = data.split('\n');
                     juegos.forEach((juego, index) => {
-                        if (index > 0) {
-                            const [nombre, codigo] = juego.split(',').map(part => part.trim());
-                            const imagen = `${codigo}_COV`;
+                        if (index > 0 && juego.trim() !== '') {
+                            let partes = juego.split(',');
+                            let nombre = partes[0].trim();
+                            let codigo = partes[1].trim();
+                            let imagen = `${codigo}_COV`;
 
-                            const item = document.createElement('div');
+                            let item = document.createElement('div');
                             item.classList.add('item');
                             item.setAttribute('data-nombre', nombre);
 
-                            const img = document.createElement('img');
+                            let img = document.createElement('img');
                             img.src = `https://raw.githubusercontent.com/tecnomaslanus/ps2/main/img/${imagen}.jpg`;
-                            img.onerror = () => {
-                                img.src = `https://raw.githubusercontent.com/tecnomaslanus/ps2/main/img/${imagen}.png`;
+                            img.onerror = () => { 
+                                img.src = `https://raw.githubusercontent.com/tecnomaslanus/ps2/main/img/${imagen}.png`; 
                             };
 
-                            const p = document.createElement('p');
+                            let p = document.createElement('p');
                             p.textContent = nombre;
 
                             item.appendChild(img);
                             item.appendChild(p);
                             document.getElementById('catalogo').appendChild(item);
-
-                            item.addEventListener('click', () => {
-                                toggleSeleccion(nombre);
-                            });
                         }
+                    });
+
+                    document.querySelectorAll('.item').forEach(item => {
+                        item.addEventListener('click', () => {
+                            item.classList.toggle('selected');
+                            actualizarContador();
+                        });
                     });
                 })
                 .catch(error => console.error('Error al cargar el CSV:', error));
         }
 
-        function toggleSeleccion(nombre) {
-            if (seleccionados.has(nombre)) {
-                seleccionados.delete(nombre);
-            } else {
-                seleccionados.add(nombre);
+        function guardarCSV() {
+            let seleccionados = document.querySelectorAll('.item.selected');
+            let nombres = Array.from(seleccionados).map(item => item.getAttribute('data-nombre'));
+            
+            if (nombres.length === 0) {
+                alert("Seleccioná al menos un juego.");
+                return;
             }
-            actualizarListaSeleccionados();
-            actualizarContador();
+
+            let csvContent = "data:text/csv;charset=utf-8," + nombres.join("\n");
+            let blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+            saveAs(blob, "juegos_seleccionados.csv");
         }
 
-        function actualizarListaSeleccionados() {
-            const lista = document.getElementById('listaSeleccionados');
-            lista.innerHTML = '';
-            seleccionados.forEach(nombre => {
-                const div = document.createElement('div');
-                div.classList.add('seleccionado-item');
+        function generarCSV() {
+            let seleccionados = document.querySelectorAll('.item.selected');
+            let nombres = Array.from(seleccionados).map(item => item.getAttribute('data-nombre'));
 
-                const label = document.createElement('label');
-                label.textContent = nombre;
+            if (nombres.length === 0) {
+                alert("Seleccioná al menos un juego.");
+                return;
+            }
 
-                const checkbox = document.createElement('input');
-                checkbox.type = 'checkbox';
-                checkbox.checked = true;
-                checkbox.onchange = () => {
-                    toggleSeleccion(nombre);
-                };
+            let csvContent = nombres.join("\n");
+            let blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
 
-                div.append
-::contentReference[oaicite:0]{index=0}
+            let file = new File([blob], "list.csv", { type: "text/csv" });
+            let fileInput = document.getElementById("csvFile");
+            let dataTransfer = new DataTransfer();
+            dataTransfer.items.add(file);
+            fileInput.files = dataTransfer.files;
+
+            document.getElementById("emailForm").submit();
+        }
+
+        function filtrarJuegos() {
+            let input = document.getElementById("busqueda").value.toLowerCase();
+            let items = document.querySelectorAll(".item");
+
+            items.forEach(item => {
+                let nombre = item.getAttribute("data-nombre").toLowerCase();
+                item.style.display = nombre.includes(input) ? "block" : "none";
+            });
+        }
+
+        function actualizarContador() {
+            let seleccionados = document.querySelectorAll('.item.selected');
+            document.getElementById('contador').textContent = seleccionados.length;
+        }
+
+        window.onload = cargarCatalogo;
+    </script>
+
+</body>
+</html>
