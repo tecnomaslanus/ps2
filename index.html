@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catálogo de Juegos</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+        }
+        .main-content {
+            flex: 1;
+            margin-right: 300px; /* Espacio para la lista de seleccionados */
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background-color: #f4f4f4;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+        }
+        .header input {
+            padding: 8px;
+            width: 200px;
+        }
+        .header button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 0 5px;
+        }
+        .contador {
+            font-size: 18px;
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 5px 10px;
+            border-radius: 5px;
+            margin-left: -50px; /* Desplazamiento hacia la izquierda */
+        }
+        .catalogo-container {
+            margin-top: 80px; /* Para evitar que el contenido se superponga con la cabecera */
+            padding: 20px;
+        }
+        .catalogo {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr); /* 6 columnas */
+            gap: 15px;
+            justify-items: center;
+        }
+        .item {
+            width: 150px;
+            cursor: pointer;
+            padding: 10px;
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .item img {
+            width: 100%;
+            border-radius: 8px;
+        }
+        .selected {
+            border-color: #007BFF;
+            background-color: #E6F0FF;
+        }
+        .selected-list {
+            position: fixed;
+            right: 0;
+            top: 0;
+            width: 300px;
+            height: 100%;
+            background-color: #f9f9f9;
+            border-left: 1px solid #ccc;
+            padding: 20px;
+            box-shadow: -2px 0 5px rgba(0,0,0,0.1);
+            overflow-y: auto;
+        }
+        .selected-list h3 {
+            margin-top: 80px; /* Para evitar que el título se superponga con la cabecera */
+        }
+        .selected-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 5px 0;
+            border-bottom: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="main-content">
+        <div class="header">
+            <input type="text" id="busqueda" placeholder="Buscar juego..." onkeyup="filtrarJuegos()">
+            <div>
+                <button onclick="guardarCSV()">Guardar</button>
+                <button type="button" onclick="generarCSV()">Enviar por correo</button>
+            </div>
+            <div class="contador">
+                Juegos seleccionados: <span id="contador">0</span>
+            </div>
+        </div>
+
+        <div class="catalogo-container">
+            <h2>Catálogo de Juegos</h2>
+            <div class="catalogo" id="catalogo">
+                <!-- Los juegos se cargarán aquí dinámicamente -->
+            </div>
+        </div>
+    </div>
+
+    <div class="selected-list">
+        <h3>Juegos Seleccionados</h3>
+        <div id="listaSeleccionados">
+            <!-- Lista de juegos seleccionados -->
+        </div>
+    </div>
+
+    <!-- Formulario oculto para enviar el archivo con FormSubmit -->
+    <form id="emailForm" action="https://formsubmit.co/tu_correo@example.com" method="POST" enctype="multipart/form-data">
+        <input type="hidden" name="_subject" value="Juegos Seleccionados">
+        <input type="file" id="csvFile" name="attachment" hidden>
+    </form>
+
+    <script>
+        function cargarCatalogo() {
+            fetch('list.csv')
+                .then(response => response.text())
+                .then(data => {
+                    let juegos = data.split('\n');
+                    juegos.forEach((juego, index) => {
+                        if (index > 0 && juego.trim() !== '') {
+                            let partes = juego.split(',');
+                            let nombre = partes[0].trim();
+                            let codigo = partes[1].trim();
+                            let imagen = `${codigo}_COV`;
+
+                            let item = document.createElement('div');
+                            item.classList.add('item');
+                            item.setAttribute('data-nombre', nombre);
+
+                            let img = document.createElement('img');
+                            img.src = `https://raw.githubusercontent.com/tecnomaslanus/ps2/main/img/${imagen}.jpg`;
+                            img.onerror = () => { 
+                                img.src = `https://raw.githubusercontent.com/tecnomaslanus/ps2/main/img/${imagen}.png`; 
+                            };
+
+                            let p = document.createElement('p');
+                            p.textContent = nombre;
+
+                            item.appendChild(img);
+                            item.appendChild(p);
+                            document.getElementById('catalogo').appendChild(item);
+
+                            item.addEventListener('click', () => {
+                                item.classList
+::contentReference[oaicite:0]{index=0}
+ 
