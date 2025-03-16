@@ -8,7 +8,8 @@
     <style>
         body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
         .container { display: flex; justify-content: space-between; margin: 20px; }
-        .catalogo { display: grid; grid-template-columns: repeat(6, 1fr); gap: 15px; margin-top: 20px; width: 75%; }
+        .catalogo-container { width: 75%; }
+        .catalogo { display: grid; grid-template-columns: repeat(6, 1fr); gap: 15px; margin-top: 20px; }
         .item { cursor: pointer; padding: 10px; border: 2px solid #ccc; border-radius: 8px; text-align: center; }
         .item img { width: 100%; border-radius: 8px; }
         .selected { border-color: #007BFF; background-color: #E6F0FF; }
@@ -24,13 +25,16 @@
         <input type="text" id="busqueda" placeholder="Buscar juego..." onkeyup="filtrarJuegos()">
         <div>
             <button onclick="guardarCSV()">Guardar</button>
+            <button type="button" onclick="generarCSV()">Enviar por correo</button>
         </div>
         <div class="contador">
             Juegos seleccionados: <span id="contador">0</span>
         </div>
     </div>
     <div class="container">
-        <div class="catalogo" id="catalogo"></div>
+        <div class="catalogo-container">
+            <div class="catalogo" id="catalogo"></div>
+        </div>
         <div class="lista-seleccionados" id="seleccionados">
             <h3>Juegos Seleccionados</h3>
             <ul id="lista"></ul>
@@ -91,9 +95,12 @@
                 alert("Seleccioná al menos un juego.");
                 return;
             }
-            let csvContent = nombres.join("\n");
+            let csvContent = "data:text/csv;charset=utf-8," + nombres.join("\n");
             let blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
             saveAs(blob, "list.csv");
+        }
+        function generarCSV() {
+            alert("Funcionalidad de envío por correo en desarrollo");
         }
         function filtrarJuegos() {
             let input = document.getElementById("busqueda").value.toLowerCase();
