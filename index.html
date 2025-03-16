@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catálogo de Juegos</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin-top: 50px; display: flex; }
+        .catalogo-container { flex: 1; padding: 20px; }
+        .catalogo { display: grid; grid-template-columns: repeat(6, 1fr); gap: 15px; }
+        .item { cursor: pointer; padding: 10px; border: 2px solid #ccc; border-radius: 8px; text-align: center; }
+        .item img { width: 100%; border-radius: 8px; }
+        .selected { border-color: #007BFF; background-color: #E6F0FF; }
+        .header { display: flex; justify-content: space-between; align-items: center; padding: 10px; background-color: #f4f4f4; position: fixed; top: 0; width: 100%; z-index: 1000; }
+        .contador { font-size: 18px; background-color: rgba(255, 255, 255, 0.8); padding: 5px 10px; border-radius: 5px; margin-left: 20px; }
+        .seleccionados-container { width: 300px; padding: 20px; background-color: #f9f9f9; border-left: 1px solid #ccc; overflow-y: auto; height: 100vh; position: fixed; right: 0; top: 0; }
+        .seleccionados-container h3 { margin-top: 60px; }
+        .seleccionado-item { display: flex; align-items: center; justify-content: space-between; padding: 5px 0; }
+        .seleccionado-item label { flex: 1; text-align: left; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <input type="text" id="busqueda" placeholder="Buscar juego..." onkeyup="filtrarJuegos()">
+        <div>
+            <button onclick="guardarCSV()">Guardar</button>
+            <button type="button" onclick="generarCSV()">Enviar por correo</button>
+        </div>
+        <div class="contador">
+            Juegos seleccionados: <span id="contador">0</span>
+        </div>
+    </div>
+
+    <div class="catalogo-container">
+        <h2>Catálogo de Juegos</h2>
+        <div class="catalogo" id="catalogo">
+            <!-- Los juegos se cargarán aquí dinámicamente -->
+        </div>
+    </div>
+
+    <div class="seleccionados-container">
+        <h3>Juegos Seleccionados</h3>
+        <div id="listaSeleccionados">
+            <!-- Lista de juegos seleccionados -->
+        </div>
+    </div>
+
+    <!-- Formulario oculto para enviar el archivo con FormSubmit -->
+    <form id="emailForm" action="https://formsubmit.co/tu_correo@example.com" method="POST" enctype="multipart/form-data">
+        <input type="hidden" name="_subject" value="Juegos Seleccionados">
+        <input type="file" id="csvFile" name="attachment" hidden>
+    </form>
+
+    <script>
+        const seleccionados = new Set();
+
+        function cargarCatalogo() {
+            fetch('list.csv')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('No se pudo cargar el archivo CSV.');
+                    }
+                    return response.text();
+                })
+                .then(data => {
+                    const juegos = data.split('\n').map(juego => juego.trim()).filter(juego => juego);
+                    juegos.forEach((juego, index) => {
+                        if (index > 0) {
+                            const [nombre, codigo] = juego.split(',').map(part => part.trim());
+                            const imagen = `${codigo}_COV`;
+
+                            const item = document.createElement('div');
+                            item.classList.add('item');
+                            item.setAttribute('data-nombre', nombre);
+
+                            const img = document.createElement('img');
+                            img.src = `https://raw.githubusercontent.com/tecnomaslanus/ps2/main/img/${imagen}.jpg`;
+                            img.onerror = () => {
+                                img.src = `https://raw.githubusercontent.com/tecnomaslanus/ps2/main/img/${imagen}.png`;
+                            };
+
+                            const p = document.createElement('p');
+                            p.textContent = nombre;
+
+                            item.appendChild(img);
+                            item.appendChild(p);
+                            document.getElementById('catalogo').appendChild(item);
+
+                            item.addEventListener('click', () => {
+                                toggleSeleccion(nombre);
+                            });
+                        }
+                    });
+                })
+                .catch(error => console.error('Error al cargar el CSV:', error));
+        }
+
+        function toggleSeleccion(nombre) {
+            if (seleccionados.has(nombre)) {
+                seleccionados.delete(nombre);
+            } else {
+                seleccionados.add(nombre);
+            }
+            actualizarListaSeleccionados();
+            actualizarContador();
+        }
+
+        function actualizarListaSeleccionados() {
+            const lista = document.getElementById('listaSeleccionados');
+            lista.innerHTML = '';
+            seleccionados.forEach(nombre => {
+                const div = document.createElement('div');
+                div.classList.add('seleccionado-item');
+
+                const label = document.createElement('label');
+                label.textContent = nombre;
+
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.checked = true;
+                checkbox.onchange = () => {
+                    toggleSeleccion(nombre);
+                };
+
+                div.append
+::contentReference[oaicite:0]{index=0}
