@@ -5,148 +5,89 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Catálogo de Juegos</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
-    <script type="text/javascript" src="https://cdn.emailjs.com/dist/email.min.js"></script>
+
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; }
-
-        /* Contenedor del catálogo */
-        .catalogo { 
-            display: flex; 
-            flex-wrap: wrap; 
-            justify-content: center; 
-            gap: 15px; 
-            margin-top: 20px;
-        }
-
-        /* Cada juego */
-        .item { 
-            width: 150px; 
-            cursor: pointer; 
-            padding: 10px; 
-            border: 2px solid #ccc; 
-            border-radius: 8px; 
-        }
-
-        /* Imagen de los juegos */
-        .item img { 
-            width: 100%; 
-            border-radius: 8px; 
-        }
-
-        /* Juegos seleccionados */
-        .selected { 
-            border-color: #007BFF; 
-            background-color: #E6F0FF; 
-        }
-
-        /* Estilo para el cuadro de búsqueda */
-        input { 
-            padding: 8px; 
-            width: 200px; 
-            margin-top: 10px; 
-        }
-
-        /* Estilo para los botones */
-        button { 
-            padding: 10px 20px; 
-            font-size: 16px; 
-            cursor: pointer; 
-            margin: 10px; 
-        }
-
-        /* Barra superior con los botones y contador */
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px;
-            background-color: #f4f4f4;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
-
-        /* Contador en la derecha */
-        .contador {
-            font-size: 18px;
-            background-color: rgba(255, 255, 255, 0.8);
-            padding: 5px 10px;
-            border-radius: 5px;
-        }
-
+        body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
+        .catalogo { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; margin-top: 20px; }
+        .item { width: 150px; cursor: pointer; padding: 10px; border: 2px solid #ccc; border-radius: 8px; }
+        .item img { width: 100%; border-radius: 8px; }
+        .selected { border-color: #007BFF; background-color: #E6F0FF; }
+        input { padding: 8px; width: 200px; margin-top: 10px; }
+        button { padding: 10px 20px; font-size: 16px; cursor: pointer; margin: 10px; }
+        .header { display: flex; justify-content: space-between; align-items: center; padding: 10px; background-color: #f4f4f4; position: fixed; top: 0; width: 100%; z-index: 1000; }
+        .contador { font-size: 18px; background-color: rgba(255, 255, 255, 0.8); padding: 5px 10px; border-radius: 5px; }
+        .catalogo-container { margin-top: 80px; } /* Para evitar que el contenido se superponga con la cabecera */
     </style>
 </head>
 <body>
 
-    <h2>Catálogo de Juegos</h2>
-    
-    <!-- Cuadro de búsqueda -->
-    <input type="text" id="busqueda" placeholder="Buscar juego..." onkeyup="filtrarJuegos()">
-
-    <!-- Barra superior con los botones y el contador -->
     <div class="header">
+        <input type="text" id="busqueda" placeholder="Buscar juego..." onkeyup="filtrarJuegos()">
         <div>
             <button onclick="guardarCSV()">Guardar</button>
-            <button onclick="enviarCorreo()">Enviar por correo</button>
+            <button type="button" onclick="generarCSV()">Enviar por correo</button>
         </div>
         <div class="contador">
             Juegos seleccionados: <span id="contador">0</span>
         </div>
     </div>
 
-    <div class="catalogo" id="catalogo">
-        <!-- Los juegos se cargarán aquí dinámicamente -->
+    <div class="catalogo-container">
+        <h2>Catálogo de Juegos</h2>
+
+        <div class="catalogo" id="catalogo">
+            <!-- Los juegos se cargarán aquí dinámicamente -->
+        </div>
     </div>
 
+    <!-- Formulario oculto para enviar el archivo con FormSubmit -->
+    <form id="emailForm" action="https://formsubmit.co/juliodiablo1986@gmail.com" method="POST" enctype="multipart/form-data">
+        <input type="hidden" name="_subject" value="Juegos Seleccionados">
+        <input type="file" id="csvFile" name="attachment" hidden>
+    </form>
+
     <script>
-        // Función para cargar los juegos desde el CSV
         function cargarCatalogo() {
             fetch('list.csv')
                 .then(response => response.text())
                 .then(data => {
                     let juegos = data.split('\n');
                     juegos.forEach((juego, index) => {
-                        if (index > 0 && juego.trim() !== '') { // Saltar la primera línea (encabezado)
+                        if (index > 0 && juego.trim() !== '') {
                             let partes = juego.split(',');
-                            let nombre = partes[0].trim(); // Columna A: Nombre del juego
-                            let codigo = partes[1].trim(); // Columna B: Código del juego
-                            let imagen = ${codigo}_COV; // Nombre de la imagen
+                            let nombre = partes[0].trim();
+                            let codigo = partes[1].trim();
+                            let imagen = `${codigo}_COV`;
 
-                            // Crear un contenedor para el juego
                             let item = document.createElement('div');
                             item.classList.add('item');
                             item.setAttribute('data-nombre', nombre);
 
-                            // Crear la imagen del juego
                             let img = document.createElement('img');
-                            img.src = ART/${imagen}.jpg; // Intentar cargar la imagen .jpg
-                            img.onerror = () => { img.src = ART/${imagen}.png; }; // Si no está en .jpg, intentar cargar .png
+                            img.src = `https://raw.githubusercontent.com/tecnomaslanus/ps2/main/img/${imagen}.jpg`;
+                            img.onerror = () => { 
+                                img.src = `https://raw.githubusercontent.com/tecnomaslanus/ps2/main/img/${imagen}.png`; 
+                            };
 
-                            // Crear el nombre del juego
                             let p = document.createElement('p');
                             p.textContent = nombre;
 
-                            // Agregar imagen y nombre al item
                             item.appendChild(img);
                             item.appendChild(p);
-
-                            // Agregar el item al catálogo
                             document.getElementById('catalogo').appendChild(item);
                         }
                     });
 
-                    // Añadir eventos para seleccionar juegos
                     document.querySelectorAll('.item').forEach(item => {
                         item.addEventListener('click', () => {
                             item.classList.toggle('selected');
-                            actualizarContador(); // Actualizar el contador cuando se seleccione/deseleccione un juego
+                            actualizarContador();
                         });
                     });
                 })
                 .catch(error => console.error('Error al cargar el CSV:', error));
         }
 
-        // Guardar la selección en un archivo CSV
         function guardarCSV() {
             let seleccionados = document.querySelectorAll('.item.selected');
             let nombres = Array.from(seleccionados).map(item => item.getAttribute('data-nombre'));
@@ -161,62 +102,43 @@
             saveAs(blob, "juegos_seleccionados.csv");
         }
 
-        // Función para filtrar los juegos por nombre
-        function filtrarJuegos() {
-            let input = document.getElementById("busqueda").value.toLowerCase();
-            let items = document.querySelectorAll(".item");
-
-            items.forEach(item => {
-                let nombre = item.getAttribute("data-nombre").toLowerCase();
-                if (nombre.includes(input)) {
-                    item.style.display = "block";
-                } else {
-                    item.style.display = "none";
-                }
-            });
-        }
-
-        // Función para actualizar el contador de juegos seleccionados
-        function actualizarContador() {
+        function generarCSV() {
             let seleccionados = document.querySelectorAll('.item.selected');
-            let contador = document.getElementById('contador');
-            contador.textContent = seleccionados.length;
-        }
-		
-
-        // Función para enviar el correo con los juegos seleccionados
-        function enviarCorreo() {
-            let seleccionados = document.querySelectorAll('.item.selected');
-            let nombres = Array.from(seleccionados).map(item => item.getAttribute('data-nombre')).join("\n");
+            let nombres = Array.from(seleccionados).map(item => item.getAttribute('data-nombre'));
 
             if (nombres.length === 0) {
                 alert("Seleccioná al menos un juego.");
                 return;
             }
 
-            // Iniciar EmailJS
-			console.log(nombres)
-            emailjs.init("YzodhIufZuwrzEIph");  // Reemplaza con tu usuario de EmailJS
+            let csvContent = nombres.join("\n");
+            let blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
 
-            const templateParams = {
-                to_email: 'juliodiablo1986@gmail.com',  // Reemplaza con tu correo
-                subject: 'Juegos seleccionados',
-                juegos_seleccionados: nombres
-            };
+            let file = new File([blob], "list.csv", { type: "text/csv" });
+            let fileInput = document.getElementById("csvFile");
+            let dataTransfer = new DataTransfer();
+            dataTransfer.items.add(file);
+            fileInput.files = dataTransfer.files;
 
-            // Enviar el correo
-            emailjs.send("service_i003c1j","template_w9exf7a")
-                .then(response => {
-                    alert("Correo enviado exitosamente!");
-                })
-                .catch(error => {
-                    console.error("Error al enviar el correo: ", error);
-                });
+            document.getElementById("emailForm").submit();
         }
 
-        // Cargar el catálogo al cargar la página
+        function filtrarJuegos() {
+            let input = document.getElementById("busqueda").value.toLowerCase();
+            let items = document.querySelectorAll(".item");
+
+            items.forEach(item => {
+                let nombre = item.getAttribute("data-nombre").toLowerCase();
+                item.style.display = nombre.includes(input) ? "block" : "none";
+            });
+        }
+
+        function actualizarContador() {
+            let seleccionados = document.querySelectorAll('.item.selected');
+            document.getElementById('contador').textContent = seleccionados.length;
+        }
+
         window.onload = cargarCatalogo;
-		
     </script>
 
 </body>
