@@ -11,7 +11,7 @@
         .item { width: 150px; cursor: pointer; padding: 10px; border: 2px solid #ccc; border-radius: 8px; }
         .item img { width: 100%; border-radius: 8px; }
         .selected { border-color: #007BFF; background-color: #E6F0FF; }
-        .seleccionados-container { margin-top: 20px; padding: 10px; border: 1px solid #ccc; width: 300px; margin-left: auto; margin-right: auto; }
+        .seleccionados-container { margin-top: 20px; padding: 10px; border: 1px solid #ccc; width: 300px; margin-left: auto; margin-right: auto; background: #f9f9f9; display: block; }
         .seleccionados-container ul { list-style: none; padding: 0; }
         .seleccionados-container li { display: flex; justify-content: space-between; align-items: center; padding: 5px; border-bottom: 1px solid #ddd; }
     </style>
@@ -29,7 +29,7 @@
         <h2>Catálogo de Juegos</h2>
         <div class="catalogo" id="catalogo"></div>
     </div>
-    <div class="seleccionados-container">
+    <div class="seleccionados-container" id="seleccionados-container" style="display: none;">
         <h3>Juegos Seleccionados</h3>
         <ul id="lista-seleccionados"></ul>
     </div>
@@ -73,8 +73,14 @@
         }
         function actualizarListaSeleccionados() {
             let lista = document.getElementById('lista-seleccionados');
+            let contenedor = document.getElementById('seleccionados-container');
             lista.innerHTML = '';
             let seleccionados = document.querySelectorAll('.item.selected');
+            if (seleccionados.length > 0) {
+                contenedor.style.display = 'block';
+            } else {
+                contenedor.style.display = 'none';
+            }
             seleccionados.forEach(item => {
                 let nombre = item.getAttribute('data-nombre');
                 let li = document.createElement('li');
