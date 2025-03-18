@@ -26,6 +26,7 @@
         <div>
             <button onclick="guardarCSV()">Guardar</button>
             <button type="button" onclick="generarCSV()">Enviar por correo</button>
+            <button onclick="guardarLista()">Guardar Lista</button>
         </div>
         <div class="contador">Juegos seleccionados: <span id="contador">0</span></div>
     </div>
@@ -85,6 +86,17 @@
             let csvContent = "data:text/csv;charset=utf-8," + nombres.join("\n");
             let blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
             saveAs(blob, "listaps2.csv");
+        }
+        function guardarLista() {
+            let seleccionados = document.querySelectorAll('.item.selected');
+            let nombres = Array.from(seleccionados).map(item => item.getAttribute('data-nombre'));
+            if (nombres.length === 0) {
+                alert("Seleccioná al menos un juego.");
+                return;
+            }
+            let csvContent = "data:text/csv;charset=utf-8," + nombres.join("\n");
+            let blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+            saveAs(blob, "lista.csv");
         }
         window.onload = cargarCatalogo;
     </script>
