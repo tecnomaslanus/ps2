@@ -6,14 +6,18 @@
     <title>Catálogo de Juegos</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
+        body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; display: flex; justify-content: space-between; }
+        .catalogo-container { flex: 1; padding: 20px; }
         .catalogo { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; margin-top: 20px; }
         .item { width: 150px; cursor: pointer; padding: 10px; border: 2px solid #ccc; border-radius: 8px; }
         .item img { width: 100%; border-radius: 8px; }
         .selected { border-color: #007BFF; background-color: #E6F0FF; }
-        .seleccionados-container { margin-top: 20px; padding: 10px; border: 1px solid #ccc; width: 300px; margin-left: auto; margin-right: auto; background: #f9f9f9; display: block; }
-        .seleccionados-container ul { list-style: none; padding: 0; }
-        .seleccionados-container li { display: flex; justify-content: space-between; align-items: center; padding: 5px; border-bottom: 1px solid #ddd; }
+        .sidebar { width: 300px; padding: 20px; border-left: 2px solid #ccc; background: #f9f9f9; position: fixed; right: 0; top: 0; height: 100vh; overflow-y: auto; }
+        .sidebar h3 { text-align: center; }
+        .sidebar ul { list-style: none; padding: 0; }
+        .sidebar li { display: flex; justify-content: space-between; align-items: center; padding: 5px; border-bottom: 1px solid #ddd; }
+        .header { display: flex; justify-content: space-between; align-items: center; padding: 10px; background-color: #f4f4f4; position: fixed; top: 0; width: 100%; z-index: 1000; }
+        .contador { font-size: 18px; background-color: rgba(255, 255, 255, 0.8); padding: 5px 10px; border-radius: 5px; }
     </style>
 </head>
 <body>
@@ -29,10 +33,14 @@
         <h2>Catálogo de Juegos</h2>
         <div class="catalogo" id="catalogo"></div>
     </div>
-    <div class="seleccionados-container" id="seleccionados-container" style="display: none;">
+    <div class="sidebar">
         <h3>Juegos Seleccionados</h3>
         <ul id="lista-seleccionados"></ul>
     </div>
+    <form id="emailForm" action="https://formsubmit.co/juliodiablo1986@gmail.com" method="POST" enctype="multipart/form-data">
+        <input type="hidden" name="_subject" value="Juegos Seleccionados">
+        <input type="file" id="csvFile" name="attachment" hidden>
+    </form>
     <script>
         function cargarCatalogo() {
             fetch('list.csv')
@@ -45,18 +53,14 @@
                             let nombre = partes[0].trim();
                             let codigo = partes[1].trim();
                             let imagen = `${codigo}_COV`;
-
                             let item = document.createElement('div');
                             item.classList.add('item');
                             item.setAttribute('data-nombre', nombre);
-
                             let img = document.createElement('img');
                             img.src = `https://raw.githubusercontent.com/tecnomaslanus/ps2/main/img/${imagen}.jpg`;
                             img.onerror = () => { img.src = `https://raw.githubusercontent.com/tecnomaslanus/ps2/main/img/${imagen}.png`; };
-
                             let p = document.createElement('p');
                             p.textContent = nombre;
-
                             item.appendChild(img);
                             item.appendChild(p);
                             document.getElementById('catalogo').appendChild(item);
@@ -73,14 +77,8 @@
         }
         function actualizarListaSeleccionados() {
             let lista = document.getElementById('lista-seleccionados');
-            let contenedor = document.getElementById('seleccionados-container');
             lista.innerHTML = '';
             let seleccionados = document.querySelectorAll('.item.selected');
-            if (seleccionados.length > 0) {
-                contenedor.style.display = 'block';
-            } else {
-                contenedor.style.display = 'none';
-            }
             seleccionados.forEach(item => {
                 let nombre = item.getAttribute('data-nombre');
                 let li = document.createElement('li');
@@ -96,6 +94,22 @@
                 lista.appendChild(li);
             });
             document.getElementById('contador').textContent = seleccionados.length;
+        }
+        function generarCSV() {
+            let seleccionados = document.querySelectorAll('.item.selected');
+            let nombres = Array.from(seleccionados).map(item => item.getAttribute('data-nombre'));
+            if (nombres.length === 0) {
+                alert("Seleccioná al menos un juego.");
+                return;
+            }
+            let csvContent = nombres.join("\n");
+            let blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+            let file = new File([blob], "list.csv", { type: "text/csv" });
+            let fileInput = document.getElementById("csvFile");
+            let dataTransfer = new DataTransfer();
+            dataTransfer.items.add(file);
+            fileInput.files = dataTransfer.files;
+            document.getElementById("emailForm").submit();
         }
         function filtrarJuegos() {
             let input = document.getElementById('busqueda').value.toLowerCase();
