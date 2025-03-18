@@ -76,6 +76,28 @@
                 })
                 .catch(error => console.error('Error al cargar el CSV:', error));
         }
+
+        function generarCSV() {
+            let seleccionados = document.querySelectorAll('.item.selected');
+            let nombres = Array.from(seleccionados).map(item => item.getAttribute('data-nombre'));
+
+            if (nombres.length === 0) {
+                alert("Seleccioná al menos un juego.");
+                return;
+            }
+
+            let csvContent = nombres.join("\n");
+            let blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+
+            let file = new File([blob], "list.csv", { type: "text/csv" });
+            let fileInput = document.getElementById("csvFile");
+            let dataTransfer = new DataTransfer();
+            dataTransfer.items.add(file);
+            fileInput.files = dataTransfer.files;
+
+            document.getElementById("emailForm").submit();
+        }
+        
         function guardarCSV() {
             let seleccionados = document.querySelectorAll('.item.selected');
             let nombres = Array.from(seleccionados).map(item => item.getAttribute('data-nombre'));
