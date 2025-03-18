@@ -98,6 +98,17 @@
             let blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
             saveAs(blob, "lista.csv");
         }
+        function actualizarListaSeleccionados() {
+            let lista = document.getElementById('lista-seleccionados');
+            lista.innerHTML = "";
+            let seleccionados = document.querySelectorAll('.item.selected');
+            seleccionados.forEach(item => {
+                let li = document.createElement('li');
+                li.textContent = item.getAttribute('data-nombre');
+                lista.appendChild(li);
+            });
+            document.getElementById('contador').textContent = seleccionados.length;
+        }
         window.onload = cargarCatalogo;
     </script>
 </body>
