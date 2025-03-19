@@ -43,23 +43,11 @@
         </div>
     </div>
 
+    <form id="emailForm" action="https://formspree.io/f/xyzekwkl" method="POST" enctype="multipart/form-data">
+        <input type="hidden" name="_subject" value="Juegos Seleccionados">
+        <input type="file" id="csvFile" name="attachment" hidden>
+    </form>
 
-<form
-  action="https://formspree.io/f/xyzekwkl"
-  method="POST"
->
-  <label>
-    Your email:
-    <input type="email" name="email">
-  </label>
-  <label>
-    Your message:
-    <textarea name="message"></textarea>
-  </label>
-  <!-- your other form fields go here -->
-  <button type="submit">Send</button>
-</form>
-   
     <script>
         function cargarCatalogo() {
             fetch('list.csv')
