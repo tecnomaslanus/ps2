@@ -103,40 +103,41 @@
 
 
 async function generarCSV() {
-    let seleccionados = document.querySelectorAll('.item.selected');
-    let nombres = Array.from(seleccionados).map(item => item.getAttribute('data-nombre'));
+        let seleccionados = document.querySelectorAll('.item.selected');
+        let nombres = Array.from(seleccionados).map(item => item.getAttribute('data-nombre'));
 
-    if (nombres.length === 0) {
-        alert("Seleccioná al menos un juego.");
-        return;
-    }
-
-    // Crear el contenido del CSV
-    let csvContent = nombres.join("\n");
-    let blob = new Blob([csvContent], { type: "text/csv" });
-    let file = new File([blob], "juegos_seleccionados.csv", { type: "text/csv" });
-
-    // Crear FormData con el nombre correcto del campo en JotForm
-    let formData = new FormData();
-    formData.append("fileUpload", file); // "fileUpload" debe coincidir con el nombre del campo en JotForm
-
-    try {
-        let response = await fetch("https://submit.jotform.com/submit/250778094963067", { 
-            method: "POST",
-            body: formData
-        });
-
-        if (response.ok) {
-            alert("Juegos enviados con éxito");
-        } else {
-            alert("Error al enviar los juegos. Verificá la configuración en JotForm.");
+        if (nombres.length === 0) {
+            alert("Seleccioná al menos un juego.");
+            return;
         }
-    } catch (error) {
-        console.error("Error al enviar:", error);
-        alert("Ocurrió un error al enviar.");
-    }
-}
 
+        // Crear archivo CSV
+        let csvContent = nombres.join("\n");
+        let blob = new Blob([csvContent], { type: "text/csv" });
+        let file = new File([blob], "juegos_seleccionados.csv", { type: "text/csv" });
+
+        // Crear FormData y agregar archivo
+        let formData = new FormData();
+        formData.append("fileUpload", file);  // Asegurar que el nombre coincide con el de JotForm
+        formData.append("_utf8", "✓");  // Agregar compatibilidad con JotForm
+
+        try {
+            let response = await fetch("https://submit.jotform.com/submit/250778094963067", { 
+                method: "POST",
+                body: formData
+            });
+
+            if (response.ok) {
+                alert("Juegos enviados con éxito. Revisa tu correo.");
+            } else {
+                alert("Error al enviar los juegos.");
+                console.error(await response.text());  // Mostrar el error exacto
+            }
+        } catch (error) {
+            console.error("Error al enviar:", error);
+            alert("Ocurrió un error al enviar.");
+        }
+    }
 
         
 
