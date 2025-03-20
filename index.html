@@ -118,10 +118,10 @@ async function generarCSV() {
 
         // Configuración para JotForm
         let formData = new FormData();
-        formData.append("submission[fileUpload]", file); // Reemplazar "3" con el ID del campo de carga en JotForm
+        formData.append("submission[fileUpload]", file); 
 
         try {
-            let response = await fetch("https://form.jotform.com/250778094963067", { // Reemplazar YOUR_FORM_ID con el ID de tu formulario
+            let response = await fetch("https://form.jotform.com/250778094963067", { 
                 method: "POST",
                 body: formData
             });
