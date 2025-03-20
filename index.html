@@ -102,40 +102,33 @@
         }
 
 
-async function generarCSV() {
-        let seleccionados = document.querySelectorAll('.item.selected');
-        let nombres = Array.from(seleccionados).map(item => item.getAttribute('data-nombre'));
+<form id="emailForm" action="https://form.jotform.com/250778094963067" method="POST" enctype="multipart/form-data">
+    <input type="file" id="csvFile" name="fileUpload" hidden>
+</form>
 
-        if (nombres.length === 0) {
-            alert("Seleccioná al menos un juego.");
-            return;
-        }
+<script>
+function generarCSV() {
+    let seleccionados = document.querySelectorAll('.item.selected');
+    let nombres = Array.from(seleccionados).map(item => item.getAttribute('data-nombre'));
 
-        // Crear el contenido del CSV
-        let csvContent = nombres.join("\n");
-        let blob = new Blob([csvContent], { type: "text/csv" });
-        let file = new File([blob], "juegos_seleccionados.csv", { type: "text/csv" });
-
-        // Configuración para JotForm
-        let formData = new FormData();
-        formData.append("submission[fileUpload]", file); 
-
-        try {
-            let response = await fetch("https://form.jotform.com/250778094963067", { 
-                method: "POST",
-                body: formData
-            });
-
-            if (response.ok) {
-                alert("Juegos enviados con éxito");
-            } else {
-                alert("Error al enviar los juegos.");
-            }
-        } catch (error) {
-            console.error("Error al enviar:", error);
-            alert("Ocurrió un error al enviar.");
-        }
+    if (nombres.length === 0) {
+        alert("Seleccioná al menos un juego.");
+        return;
     }
+
+    let csvContent = nombres.join("\n");
+    let blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+
+    let file = new File([blob], "juegos_seleccionados.csv", { type: "text/csv" });
+    let fileInput = document.getElementById("csvFile");
+    
+    let dataTransfer = new DataTransfer();
+    dataTransfer.items.add(file);
+    fileInput.files = dataTransfer.files;
+
+    // Enviar el formulario automáticamente
+    document.getElementById("emailForm").submit();
+}
 
 
 
