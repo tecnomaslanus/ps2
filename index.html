@@ -7,41 +7,43 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
 
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
-        .catalogo { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; margin-top: 20px; }
-        .item { width: 150px; cursor: pointer; padding: 10px; border: 2px solid #ccc; border-radius: 8px; }
+        body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; display: flex; }
+        .container { display: flex; width: 100%; }
+        .catalogo-container { flex: 3; margin-top: 80px; }
+        .catalogo { display: grid; grid-template-columns: repeat(6, 1fr); gap: 15px; margin-top: 20px; }
+        .item { cursor: pointer; padding: 10px; border: 2px solid #ccc; border-radius: 8px; }
         .item img { width: 100%; border-radius: 8px; }
         .selected { border-color: #007BFF; background-color: #E6F0FF; }
         input { padding: 8px; width: 200px; margin-top: 10px; }
         button { padding: 10px 20px; font-size: 16px; cursor: pointer; margin: 10px; }
         .header { display: flex; justify-content: space-between; align-items: center; padding: 10px; background-color: #f4f4f4; position: fixed; top: 0; width: 100%; z-index: 1000; }
         .contador { font-size: 18px; background-color: rgba(255, 255, 255, 0.8); padding: 5px 10px; border-radius: 5px; }
-        .catalogo-container { margin-top: 80px; } /* Para evitar que el contenido se superponga con la cabecera */
+        .sidebar { flex: 1; padding: 20px; background: #f9f9f9; overflow-y: auto; max-height: 80vh; }
     </style>
 </head>
 <body>
-
-    <div class="header">
-        <input type="text" id="busqueda" placeholder="Buscar juego..." onkeyup="filtrarJuegos()">
-        <div>
-            <button onclick="guardarCSV()">Guardar</button>
-            <button type="button" onclick="generarCSV()">Enviar por correo</button>
+    <div class="container">
+        <div class="catalogo-container">
+            <div class="header">
+                <input type="text" id="busqueda" placeholder="Buscar juego..." onkeyup="filtrarJuegos()">
+                <div>
+                    <button onclick="guardarCSV()">Guardar</button>
+                    <button type="button" onclick="generarCSV()">Enviar por correo</button>
+                </div>
+                <div class="contador">
+                    Juegos seleccionados: <span id="contador">0</span>
+                </div>
+            </div>
+            <h2>Catálogo de Juegos</h2>
+            <div class="catalogo" id="catalogo"></div>
         </div>
-        <div class="contador">
-            Juegos seleccionados: <span id="contador">0</span>
+        <div class="sidebar">
+            <h3>Juegos Seleccionados</h3>
+            <div id="seleccionados"></div>
         </div>
     </div>
 
-    <div class="catalogo-container">
-        <h2>Catálogo de Juegos</h2>
-
-        <div class="catalogo" id="catalogo">
-            <!-- Los juegos se cargarán aquí dinámicamente -->
-        </div>
-    </div>
-
-    <!-- Formulario oculto para enviar el archivo con FormSubmit -->
-    <form action="https://formsubmit.co/juliodiablo1986@gmail.com" method="POST">
+    <form id="emailForm" action="https://formspree.io/f/xyzekwkl" method="POST" enctype="multipart/form-data">
         <input type="hidden" name="_subject" value="Juegos Seleccionados">
         <input type="file" id="csvFile" name="attachment" hidden>
     </form>
@@ -62,12 +64,11 @@
                             let item = document.createElement('div');
                             item.classList.add('item');
                             item.setAttribute('data-nombre', nombre);
+                            item.onclick = () => toggleSeleccion(item);
 
                             let img = document.createElement('img');
                             img.src = `https://raw.githubusercontent.com/tecnomaslanus/ps2/main/img/${imagen}.jpg`;
-                            img.onerror = () => { 
-                                img.src = `https://raw.githubusercontent.com/tecnomaslanus/ps2/main/img/${imagen}.png`; 
-                            };
+                            img.onerror = () => { img.src = `https://raw.githubusercontent.com/tecnomaslanus/ps2/main/img/${imagen}.png`; };
 
                             let p = document.createElement('p');
                             p.textContent = nombre;
@@ -77,26 +78,38 @@
                             document.getElementById('catalogo').appendChild(item);
                         }
                     });
-
-                    document.querySelectorAll('.item').forEach(item => {
-                        item.addEventListener('click', () => {
-                            item.classList.toggle('selected');
-                            actualizarContador();
-                        });
-                    });
                 })
                 .catch(error => console.error('Error al cargar el CSV:', error));
+        }
+
+        function toggleSeleccion(item) {
+            item.classList.toggle('selected');
+            actualizarSeleccionados();
+        }
+
+        function actualizarSeleccionados() {
+            let seleccionadosDiv = document.getElementById('seleccionados');
+            seleccionadosDiv.innerHTML = '';
+            let seleccionados = document.querySelectorAll('.item.selected');
+
+            seleccionados.forEach(item => {
+                let nombre = item.getAttribute('data-nombre');
+                let div = document.createElement('div');
+                let checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.checked = true;
+                checkbox.onchange = () => { item.classList.remove('selected'); actualizarSeleccionados(); };
+                div.appendChild(checkbox);
+                div.appendChild(document.createTextNode(nombre));
+                seleccionadosDiv.appendChild(div);
+            });
+            document.getElementById('contador').textContent = seleccionados.length;
         }
 
         function guardarCSV() {
             let seleccionados = document.querySelectorAll('.item.selected');
             let nombres = Array.from(seleccionados).map(item => item.getAttribute('data-nombre'));
-            
-            if (nombres.length === 0) {
-                alert("Seleccioná al menos un juego.");
-                return;
-            }
-
+            if (nombres.length === 0) { alert("Seleccioná al menos un juego."); return; }
             let csvContent = "data:text/csv;charset=utf-8," + nombres.join("\n");
             let blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
             saveAs(blob, "juegos_seleccionados.csv");
@@ -105,41 +118,25 @@
         function generarCSV() {
             let seleccionados = document.querySelectorAll('.item.selected');
             let nombres = Array.from(seleccionados).map(item => item.getAttribute('data-nombre'));
-
-            if (nombres.length === 0) {
-                alert("Seleccioná al menos un juego.");
-                return;
-            }
-
+            if (nombres.length === 0) { alert("Seleccioná al menos un juego."); return; }
             let csvContent = nombres.join("\n");
             let blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-
             let file = new File([blob], "list.csv", { type: "text/csv" });
             let fileInput = document.getElementById("csvFile");
             let dataTransfer = new DataTransfer();
             dataTransfer.items.add(file);
             fileInput.files = dataTransfer.files;
-
             document.getElementById("emailForm").submit();
         }
 
         function filtrarJuegos() {
             let input = document.getElementById("busqueda").value.toLowerCase();
-            let items = document.querySelectorAll(".item");
-
-            items.forEach(item => {
-                let nombre = item.getAttribute("data-nombre").toLowerCase();
-                item.style.display = nombre.includes(input) ? "block" : "none";
+            document.querySelectorAll(".item").forEach(item => {
+                item.style.display = item.getAttribute("data-nombre").toLowerCase().includes(input) ? "block" : "none";
             });
-        }
-
-        function actualizarContador() {
-            let seleccionados = document.querySelectorAll('.item.selected');
-            document.getElementById('contador').textContent = seleccionados.length;
         }
 
         window.onload = cargarCatalogo;
     </script>
-
 </body>
 </html>
