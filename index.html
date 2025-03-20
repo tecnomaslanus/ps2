@@ -101,32 +101,40 @@
             saveAs(blob, "juegos_seleccionados.csv");
         }
 
-       function generarCSV() {
-    let seleccionados = document.querySelectorAll('.item.selected');
-    let nombres = Array.from(seleccionados).map(item => item.getAttribute('data-nombre'));
+        async function generarCSV() {
+        let seleccionados = document.querySelectorAll('.item.selected');
+        let nombres = Array.from(seleccionados).map(item => item.getAttribute('data-nombre'));
 
-    if (nombres.length === 0) {
-        alert("Seleccioná al menos un juego.");
-        return;
+        if (nombres.length === 0) {
+            alert("Seleccioná al menos un juego.");
+            return;
+        }
+
+        // Crear el contenido del CSV
+        let csvContent = nombres.join("\n");
+        let blob = new Blob([csvContent], { type: "text/csv" });
+        let file = new File([blob], "juegos_seleccionados.csv", { type: "text/csv" });
+
+        // Configuración para JotForm
+        let formData = new FormData();
+        formData.append("submission[fileUpload]", file); // Reemplazar "3" con el ID del campo de carga en JotForm
+
+        try {
+            let response = await fetch("https://form.jotform.com/250778094963067", { // Reemplazar YOUR_FORM_ID con el ID de tu formulario
+                method: "POST",
+                body: formData
+            });
+
+            if (response.ok) {
+                alert("Juegos enviados con éxito");
+            } else {
+                alert("Error al enviar los juegos.");
+            }
+        } catch (error) {
+            console.error("Error al enviar:", error);
+            alert("Ocurrió un error al enviar.");
+        }
     }
-
-    let csvContent = nombres.join("\n");
-    let blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-    let file = new File([blob], "juegos_seleccionados.csv", { type: "text/csv" });
-
-    let fileInput = document.getElementById("csvFile");
-    let dataTransfer = new DataTransfer();
-    dataTransfer.items.add(file);
-    fileInput.files = dataTransfer.files;
-
-    // Simular evento de cambio en el input de archivo
-    let event = new Event('change', { bubbles: true });
-    fileInput.dispatchEvent(event);
-
-    // Pequeña demora para asegurar que JotForm detecte el archivo antes de enviar
-    setTimeout(() => {
-        document.getElementById("emailForm").submit();
-    }, 500);
 }
         function filtrarJuegos() {
             let input = document.getElementById("busqueda").value.toLowerCase();
