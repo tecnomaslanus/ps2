@@ -101,27 +101,33 @@
             saveAs(blob, "juegos_seleccionados.csv");
         }
 
-        function generarCSV() {
-            let seleccionados = document.querySelectorAll('.item.selected');
-            let nombres = Array.from(seleccionados).map(item => item.getAttribute('data-nombre'));
+       function generarCSV() {
+    let seleccionados = document.querySelectorAll('.item.selected');
+    let nombres = Array.from(seleccionados).map(item => item.getAttribute('data-nombre'));
 
-            if (nombres.length === 0) {
-                alert("Seleccioná al menos un juego.");
-                return;
-            }
+    if (nombres.length === 0) {
+        alert("Seleccioná al menos un juego.");
+        return;
+    }
 
-            let csvContent = nombres.join("\n");
-            let blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    let csvContent = nombres.join("\n");
+    let blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    let file = new File([blob], "juegos_seleccionados.csv", { type: "text/csv" });
 
-            let file = new File([blob], "list.csv", { type: "text/csv" });
-            let fileInput = document.getElementById("csvFile");
-            let dataTransfer = new DataTransfer();
-            dataTransfer.items.add(file);
-            fileInput.files = dataTransfer.files;
+    let fileInput = document.getElementById("csvFile");
+    let dataTransfer = new DataTransfer();
+    dataTransfer.items.add(file);
+    fileInput.files = dataTransfer.files;
 
-            document.getElementById("emailForm").submit();
-        }
+    // Simular evento de cambio en el input de archivo
+    let event = new Event('change', { bubbles: true });
+    fileInput.dispatchEvent(event);
 
+    // Pequeña demora para asegurar que JotForm detecte el archivo antes de enviar
+    setTimeout(() => {
+        document.getElementById("emailForm").submit();
+    }, 500);
+}
         function filtrarJuegos() {
             let input = document.getElementById("busqueda").value.toLowerCase();
             let items = document.querySelectorAll(".item");
