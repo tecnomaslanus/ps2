@@ -45,6 +45,15 @@
     <script>
         let juegosSinImagen = [];
 
+        function verificarImagen(img, rutas, index, nombre, codigo) {
+            if (index >= rutas.length) {
+                juegosSinImagen.push([nombre, codigo]);
+                return;
+            }
+            img.src = rutas[index];
+            img.onerror = () => verificarImagen(img, rutas, index + 1, nombre, codigo);
+        }
+
         function cargarCatalogo() {
             fetch('list.csv')
                 .then(response => response.text())
@@ -57,24 +66,19 @@
                             let codigo = partes[1].trim();
                             let imagen = `${codigo}_COV`;
 
+                            let rutas = [
+                                `https://raw.githubusercontent.com/tecnomaslanus/ps2/main/img/${imagen}.jpg`,
+                                `https://raw.githubusercontent.com/tecnomaslanus/ps2/main/img/${imagen}.png`,
+                                `https://raw.githubusercontent.com/tecnomaslanus/ps2/main/img2/${imagen}.jpg`,
+                                `https://raw.githubusercontent.com/tecnomaslanus/ps2/main/img2/${imagen}.png`
+                            ];
+
                             let item = document.createElement('div');
                             item.classList.add('item');
                             item.setAttribute('data-nombre', nombre);
 
                             let img = document.createElement('img');
-                            img.src = `https://raw.githubusercontent.com/tecnomaslanus/ps2/main/img/${imagen}.jpg`;
-                            img.onerror = () => {
-                                img.src = `https://raw.githubusercontent.com/tecnomaslanus/ps2/main/img/${imagen}.png`;
-                                img.onerror = () => {
-                                    img.src = `https://raw.githubusercontent.com/tecnomaslanus/ps2/main/img2/${imagen}.jpg`;
-                                    img.onerror = () => {
-                                        img.src = `https://raw.githubusercontent.com/tecnomaslanus/ps2/main/img2/${imagen}.png`;
-                                        img.onerror = () => {
-                                            juegosSinImagen.push([nombre, codigo]);
-                                        };
-                                    };
-                                };
-                            };
+                            verificarImagen(img, rutas, 0, nombre, codigo);
 
                             let p = document.createElement('p');
                             p.textContent = nombre;
