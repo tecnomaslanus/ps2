@@ -5,41 +5,38 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Catálogo de Juegos</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
-
     <style>
         body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
-        .catalogo { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; margin-top: 20px; }
-        .item { width: 150px; cursor: pointer; padding: 10px; border: 2px solid #ccc; border-radius: 8px; }
+        .contenedor { display: flex; justify-content: center; align-items: flex-start; gap: 20px; }
+        .catalogo { display: grid; grid-template-columns: repeat(6, 150px); gap: 15px; margin-top: 20px; }
+        .item { cursor: pointer; padding: 10px; border: 2px solid #ccc; border-radius: 8px; }
         .item img { width: 100%; border-radius: 8px; }
         .selected { border-color: #007BFF; background-color: #E6F0FF; }
-        input { padding: 8px; width: 200px; margin-top: 10px; }
-        button { padding: 10px 20px; font-size: 16px; cursor: pointer; margin: 10px; }
         .header { display: flex; justify-content: space-between; align-items: center; padding: 10px; background-color: #f4f4f4; position: fixed; top: 0; width: 100%; z-index: 1000; }
-        .contador { font-size: 18px; background-color: rgba(255, 255, 255, 0.8); padding: 5px 10px; border-radius: 5px; }
-        .catalogo-container { margin-top: 80px; }
+        .contador { font-size: 18px; background-color: rgba(255, 255, 255, 0.8); padding: 5px 10px; border-radius: 5px; margin-right: auto; }
+        .seleccionados { width: 200px; border: 1px solid #ccc; padding: 10px; border-radius: 8px; background: #f9f9f9; text-align: left; }
     </style>
 </head>
 <body>
-
     <div class="header">
         <input type="text" id="busqueda" placeholder="Buscar juego..." onkeyup="filtrarJuegos()">
         <div>
             <button onclick="guardarCSV()">Guardar</button>
             <button type="button" onclick="generarCSV()">Enviar por correo</button>
         </div>
-        <div class="contador">
-            Juegos seleccionados: <span id="contador">0</span>
+        <div class="contador">Juegos seleccionados: <span id="contador">0</span></div>
+    </div>
+
+    <div class="contenedor">
+        <div class="catalogo-container">
+            <h2>Catálogo de Juegos</h2>
+            <div class="catalogo" id="catalogo"></div>
+        </div>
+        <div class="seleccionados">
+            <h3>Seleccionados</h3>
+            <ul id="listaSeleccionados"></ul>
         </div>
     </div>
-
-    <div class="catalogo-container">
-        <h2>Catálogo de Juegos</h2>
-        <div class="catalogo" id="catalogo"></div>
-    </div>
-
-    <form id="emailForm" action="https://form.jotform.com/250778094963067" method="POST" enctype="multipart/form-data">
-        <input type="file" id="csvFile" name="fileUpload" hidden>
-    </form>
 
     <script>
         function cargarCatalogo() {
@@ -57,6 +54,7 @@
                             let item = document.createElement('div');
                             item.classList.add('item');
                             item.setAttribute('data-nombre', nombre);
+                            item.onclick = () => toggleSeleccion(item, nombre);
 
                             let img = document.createElement('img');
                             img.src = `https://raw.githubusercontent.com/tecnomaslanus/ps2/main/img/${imagen}.jpg`;
@@ -81,91 +79,41 @@
                             document.getElementById('catalogo').appendChild(item);
                         }
                     });
-
-                    document.querySelectorAll('.item').forEach(item => {
-                        item.addEventListener('click', () => {
-                            item.classList.toggle('selected');
-                            actualizarContador();
-                        });
-                    });
                 })
                 .catch(error => console.error('Error al cargar el CSV:', error));
         }
 
-
-   function guardarCSV() {
-            let seleccionados = document.querySelectorAll('.item.selected');
-            let nombres = Array.from(seleccionados).map(item => item.getAttribute('data-nombre'));
-            
-            if (nombres.length === 0) {
-                alert("Seleccioná al menos un juego.");
-                return;
-            }
-
-            let csvContent = "data:text/csv;charset=utf-8," + nombres.join("\n");
-            let blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-            saveAs(blob, "juegos_seleccionados.csv");
+        function toggleSeleccion(item, nombre) {
+            item.classList.toggle('selected');
+            actualizarSeleccionados(nombre, item.classList.contains('selected'));
         }
 
-
-async function generarCSV() {
-        let seleccionados = document.querySelectorAll('.item.selected');
-        let nombres = Array.from(seleccionados).map(item => item.getAttribute('data-nombre'));
-
-        if (nombres.length === 0) {
-            alert("Seleccioná al menos un juego.");
-            return;
-        }
-
-        // Crear archivo CSV
-        let csvContent = nombres.join("\n");
-        let blob = new Blob([csvContent], { type: "text/csv" });
-        let file = new File([blob], "juegos_seleccionados.csv", { type: "text/csv" });
-
-        // Crear FormData y agregar archivo
-        let formData = new FormData();
-        formData.append("fileUpload", file);  // Asegurar que el nombre coincide con el de JotForm
-        formData.append("_utf8", "✓");  // Agregar compatibilidad con JotForm
-
-        try {
-            let response = await fetch("https://submit.jotform.com/submit/250778094963067", { 
-                method: "POST",
-                body: formData
-            });
-
-            if (response.ok) {
-                alert("Juegos enviados con éxito. Revisa tu correo.");
+        function actualizarSeleccionados(nombre, seleccionado) {
+            let lista = document.getElementById('listaSeleccionados');
+            if (seleccionado) {
+                let li = document.createElement('li');
+                li.innerHTML = `<input type='checkbox' checked onchange='deseleccionar("${nombre}")'> ${nombre}`;
+                li.setAttribute('data-nombre', nombre);
+                lista.appendChild(li);
             } else {
-                alert("Error al enviar los juegos.");
-                console.error(await response.text());  // Mostrar el error exacto
+                let items = lista.querySelectorAll('li');
+                items.forEach(li => {
+                    if (li.getAttribute('data-nombre') === nombre) {
+                        li.remove();
+                    }
+                });
             }
-        } catch (error) {
-            console.error("Error al enviar:", error);
-            alert("Ocurrió un error al enviar.");
+            document.getElementById('contador').textContent = lista.children.length;
         }
-    }
 
-        
-
-
-        
-
-        function filtrarJuegos() {
-            let input = document.getElementById("busqueda").value.toLowerCase();
-            let items = document.querySelectorAll(".item");
-
+        function deseleccionar(nombre) {
+            let items = document.querySelectorAll('.item');
             items.forEach(item => {
-                let nombre = item.getAttribute("data-nombre").toLowerCase();
-                item.style.display = nombre.includes(input) ? "block" : "none";
+                if (item.getAttribute('data-nombre') === nombre) {
+                    item.classList.remove('selected');
+                }
             });
-        }
-
-
-        
-
-        function actualizarContador() {
-            let seleccionados = document.querySelectorAll('.item.selected');
-            document.getElementById('contador').textContent = seleccionados.length;
+            actualizarSeleccionados(nombre, false);
         }
 
         window.onload = cargarCatalogo;
