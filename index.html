@@ -135,41 +135,47 @@
 
 
 async function generarCSV() {
-        let seleccionados = document.querySelectorAll('.item.selected');
-        let nombres = Array.from(seleccionados).map(item => item.getAttribute('data-nombre'));
+    let seleccionados = document.querySelectorAll('.item.selected');
+    let nombres = Array.from(seleccionados).map(item => item.getAttribute('data-nombre'));
 
-        if (nombres.length === 0) {
-            alert("Seleccioná al menos un juego.");
-            return;
-        }
-
-        // Crear archivo CSV
-        let csvContent = nombres.join("\n");
-        let blob = new Blob([csvContent], { type: "text/csv" });
-        let file = new File([blob], "juegos_seleccionados.csv", { type: "text/csv" });
-
-        // Crear FormData y agregar archivo
-        let formData = new FormData();
-        formData.append("fileUpload", file);  // Asegurar que el nombre coincide con el de JotForm
-        formData.append("_utf8", "✓");  // Agregar compatibilidad con JotForm
-
-        try {
-            let response = await fetch("https://submit.jotform.com/submit/250778094963067", { 
-                method: "POST",
-                body: formData
-            });
-
-            if (response.ok) {
-                alert("Juegos enviados con éxito. Revisa tu correo.");
-            } else {
-                alert("Error al enviar los juegos.");
-                console.error(await response.text());  // Mostrar el error exacto
-            }
-        } catch (error) {
-            console.error("Error al enviar:", error);
-            alert("Ocurrió un error al enviar.");
-        }
+    if (nombres.length === 0) {
+        alert("Seleccioná al menos un juego.");
+        return;
     }
+
+    // Crear contenido del CSV
+    let csvContent = "Nombre\n" + nombres.join("\n");
+    let blob = new Blob([csvContent], { type: "text/csv" });
+    
+    // Crear un objeto File para asegurar compatibilidad
+    let file = new File([blob], "juegos_seleccionados.csv", { type: "text/csv" });
+
+    // Crear FormData y adjuntar archivo
+    let formData = new FormData();
+    formData.append("fileUpload", file, "juegos_seleccionados.csv");  
+    formData.append("submit", "Enviar"); // Asegura que JotForm procese el formulario
+    formData.append("_utf8", "✓");  
+
+    try {
+        let response = await fetch("https://submit.jotform.com/submit/250778094963067", { 
+            method: "POST",
+            body: formData
+        });
+
+        let responseText = await response.text();
+        console.log("Respuesta de JotForm:", responseText);
+
+        if (response.ok) {
+            alert("Juegos enviados con éxito. Revisa tu correo.");
+        } else {
+            alert("Error al enviar los juegos.");
+            console.error(responseText);
+        }
+    } catch (error) {
+        console.error("Error al enviar:", error);
+        alert("Ocurrió un error al enviar.");
+    }
+}
 
         
 
