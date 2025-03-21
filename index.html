@@ -66,6 +66,9 @@
                                     img.src = `https://raw.githubusercontent.com/tecnomaslanus/ps2/main/img2/${imagen}.jpg`;
                                     img.onerror = () => {
                                         img.src = `https://raw.githubusercontent.com/tecnomaslanus/ps2/main/img2/${imagen}.png`;
+                                        img.onerror = () => {
+                                            img.src = `https://raw.githubusercontent.com/tecnomaslanus/ps2/main/img2/default.jpg`;
+                                        };
                                     };
                                 };
                             };
