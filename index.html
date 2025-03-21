@@ -26,7 +26,6 @@
         <div>
             <button onclick="guardarCSV()">Guardar</button>
             <button type="button" onclick="generarCSV()">Enviar por correo</button>
-            <button type="button" onclick="generarCSVJuegosSinImagen()">Generar CSV sin imágenes</button>
         </div>
         <div class="contador">
             Juegos seleccionados: <span id="contador">0</span>
@@ -43,17 +42,6 @@
     </form>
 
     <script>
-        let juegosSinImagen = [];
-
-        function verificarImagen(img, rutas, index, nombre, codigo) {
-            if (index >= rutas.length) {
-                juegosSinImagen.push([nombre, codigo]);
-                return;
-            }
-            img.src = rutas[index];
-            img.onerror = () => verificarImagen(img, rutas, index + 1, nombre, codigo);
-        }
-
         function cargarCatalogo() {
             fetch('list.csv')
                 .then(response => response.text())
@@ -66,19 +54,21 @@
                             let codigo = partes[1].trim();
                             let imagen = `${codigo}_COV`;
 
-                            let rutas = [
-                                `https://raw.githubusercontent.com/tecnomaslanus/ps2/main/img/${imagen}.jpg`,
-                                `https://raw.githubusercontent.com/tecnomaslanus/ps2/main/img/${imagen}.png`,
-                                `https://raw.githubusercontent.com/tecnomaslanus/ps2/main/img2/${imagen}.jpg`,
-                                `https://raw.githubusercontent.com/tecnomaslanus/ps2/main/img2/${imagen}.png`
-                            ];
-
                             let item = document.createElement('div');
                             item.classList.add('item');
                             item.setAttribute('data-nombre', nombre);
 
                             let img = document.createElement('img');
-                            verificarImagen(img, rutas, 0, nombre, codigo);
+                            img.src = `https://raw.githubusercontent.com/tecnomaslanus/ps2/main/img/${imagen}.jpg`;
+                            img.onerror = () => {
+                                img.src = `https://raw.githubusercontent.com/tecnomaslanus/ps2/main/img/${imagen}.png`;
+                                img.onerror = () => {
+                                    img.src = `https://raw.githubusercontent.com/tecnomaslanus/ps2/main/img2/${imagen}.jpg`;
+                                    img.onerror = () => {
+                                        img.src = `https://raw.githubusercontent.com/tecnomaslanus/ps2/main/img2/${imagen}.png`;
+                                    };
+                                };
+                            };
 
                             let p = document.createElement('p');
                             p.textContent = nombre;
@@ -97,16 +87,6 @@
                     });
                 })
                 .catch(error => console.error('Error al cargar el CSV:', error));
-        }
-
-        function generarCSVJuegosSinImagen() {
-            if (juegosSinImagen.length === 0) {
-                alert("Todos los juegos tienen imagen.");
-                return;
-            }
-            let csvContent = "Nombre,Código\n" + juegosSinImagen.map(juego => juego.join(",")).join("\n");
-            let blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-            saveAs(blob, "juegos_sin_imagen.csv");
         }
 
         function actualizarContador() {
