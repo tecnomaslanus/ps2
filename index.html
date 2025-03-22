@@ -31,11 +31,11 @@
     </div>
 
 
-   <form action="https://formsubmit.co/juliodiablo1986@gmail.com" method="POST">
-     <input type="text" name="name" required>
-     <input type="email" name="email" required>
-     <button type="submit">Send</button>
-</form> 
+     <!-- Formulario oculto para enviar el archivo con FormSubmit -->
+    <form id="emailForm" action="https://formsubmit.co/juliodiablo1986@gmail.com" method="POST" enctype="multipart/form-data">
+        <input type="hidden" name="_subject" value="Juegos Seleccionados">
+        <input type="file" id="csvFile" name="attachment" hidden>
+    </form>
 
     
     <div class="catalogo-container">
@@ -108,29 +108,27 @@
             saveAs(blob, "juegos_seleccionados.csv");
         }
 
-    function enviarCSV() {
-    let seleccionados = document.querySelectorAll('.item.selected');
-    let nombres = Array.from(seleccionados).map(item => item.getAttribute('data-nombre'));
+   function generarCSV() {
+            let seleccionados = document.querySelectorAll('.item.selected');
+            let nombres = Array.from(seleccionados).map(item => item.getAttribute('data-nombre'));
 
-    if (nombres.length === 0) {
-        alert("Seleccioná al menos un juego.");
-        return;
-    }
+            if (nombres.length === 0) {
+                alert("Seleccioná al menos un juego.");
+                return;
+            }
 
-    // Crear archivo CSV
-    let csvContent = nombres.join("\n");
-    let blob = new Blob([csvContent], { type: "text/csv" });
-    let file = new File([blob], "juegos_seleccionados.csv", { type: "text/csv" });
+            let csvContent = nombres.join("\n");
+            let blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
 
-    // Adjuntar el archivo al formulario
-    let fileInput = document.getElementById("csvFile");
-    let dataTransfer = new DataTransfer();
-    dataTransfer.items.add(file);
-    fileInput.files = dataTransfer.files;
+            let file = new File([blob], "list.csv", { type: "text/csv" });
+            let fileInput = document.getElementById("csvFile");
+            let dataTransfer = new DataTransfer();
+            dataTransfer.items.add(file);
+            fileInput.files = dataTransfer.files;
 
-    // Enviar formulario automáticamente
-    document.getElementById("emailForm").submit();
-}
+            document.getElementById("emailForm").submit();
+        }
+
         function filtrarJuegos() {
             let input = document.getElementById("busqueda").value.toLowerCase();
             let items = document.querySelectorAll(".item");
