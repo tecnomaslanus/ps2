@@ -37,8 +37,10 @@
         <div class="catalogo" id="catalogo"></div>
     </div>
 
-    <form id="emailForm" action="https://form.jotform.com/250798412697067" method="POST" enctype="multipart/form-data">
+    <form id="emailForm" action="https://formsubmit.co/tu-email@dominio.com" method="POST" enctype="multipart/form-data">
         <input type="file" id="csvFile" name="fileUpload" hidden>
+        <input type="hidden" name="_next" value="https://tu-dominio.com/gracias.html"> <!-- Redirecciona tras el envío -->
+        <input type="hidden" name="_subject" value="Juegos seleccionados">
     </form>
 
     <script>
@@ -92,8 +94,7 @@
                 .catch(error => console.error('Error al cargar el CSV:', error));
         }
 
-
-   function guardarCSV() {
+        function guardarCSV() {
             let seleccionados = document.querySelectorAll('.item.selected');
             let nombres = Array.from(seleccionados).map(item => item.getAttribute('data-nombre'));
             
@@ -107,50 +108,42 @@
             saveAs(blob, "juegos_seleccionados.csv");
         }
 
+        async function generarCSV() {
+            let seleccionados = document.querySelectorAll('.item.selected');
+            let nombres = Array.from(seleccionados).map(item => item.getAttribute('data-nombre'));
 
-async function generarCSV() {
-        let seleccionados = document.querySelectorAll('.item.selected');
-        let nombres = Array.from(seleccionados).map(item => item.getAttribute('data-nombre'));
-
-        if (nombres.length === 0) {
-            alert("Seleccioná al menos un juego.");
-            return;
-        }
-
-        // Crear archivo CSV
-        let csvContent = nombres.join("\n");
-        let blob = new Blob([csvContent], { type: "text/csv" });
-        let file = new File([blob], "juegos_seleccionados.csv", { type: "text/csv" });
-
-        // Crear FormData y agregar archivo
-        let formData = new FormData();
-        formData.append("fileUpload", file);  // Asegurar que el nombre coincide con el de JotForm
-        formData.append("_utf8", "✓");  // Agregar compatibilidad con JotForm
-
-        try {
-            
-
-            let response = await fetch("https://form.jotform.com/250798412697067", { 
-                method: "POST",
-                body: formData
-            });
-
-            if (response.ok) {
-                alert("Juegos enviados con éxito. Revisa tu correo.");
-            } else {
-                alert("Error al enviar los juegos.");
-                console.error(await response.text());  // Mostrar el error exacto
+            if (nombres.length === 0) {
+                alert("Seleccioná al menos un juego.");
+                return;
             }
-        } catch (error) {
-            console.error("Error al enviar:", error);
-            alert("Ocurrió un error al enviar.");
+
+            // Crear archivo CSV
+            let csvContent = nombres.join("\n");
+            let blob = new Blob([csvContent], { type: "text/csv" });
+            let file = new File([blob], "juegos_seleccionados.csv", { type: "text/csv" });
+
+            // Crear FormData y agregar archivo
+            let formData = new FormData();
+            formData.append("fileUpload", file);  // Asegurar que el nombre coincide con el de Formsubmit
+            formData.append("_utf8", "✓");  // Agregar compatibilidad con Formsubmit
+
+            try {
+                let response = await fetch("https://formsubmit.co/juliodiablo1986@gmail.com", { 
+                    method: "POST",
+                    body: formData
+                });
+
+                if (response.ok) {
+                    alert("Juegos enviados con éxito. Revisa tu correo.");
+                } else {
+                    alert("Error al enviar los juegos.");
+                    console.error(await response.text());  // Mostrar el error exacto
+                }
+            } catch (error) {
+                console.error("Error al enviar:", error);
+                alert("Ocurrió un error al enviar.");
+            }
         }
-    }
-
-        
-
-
-        
 
         function filtrarJuegos() {
             let input = document.getElementById("busqueda").value.toLowerCase();
@@ -161,9 +154,6 @@ async function generarCSV() {
                 item.style.display = nombre.includes(input) ? "block" : "none";
             });
         }
-
-
-        
 
         function actualizarContador() {
             let seleccionados = document.querySelectorAll('.item.selected');
