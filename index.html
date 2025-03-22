@@ -38,10 +38,10 @@
     </div>
 
     <form id="emailForm" action="https://formsubmit.co/juliodiablo1986@gmail.com" method="POST" enctype="multipart/form-data">
-        <input type="file" id="csvFile" name="fileUpload" hidden>
-        <input type="hidden" name="_next" value="https://https://tecnomaslanus.github.io/ps2/gracias.html"> <!-- Redirecciona tras el envío -->
-        <input type="hidden" name="_subject" value="Juegos seleccionados">
-    </form>
+    <input type="file" id="csvFile" name="fileUpload">
+    <input type="hidden" name="_subject" value="Juegos seleccionados">
+    <input type="hidden" name="_next" value="https://tecnomaslanus.github.io/ps2/gracias.html"> 
+</form>
 
     <script>
         function cargarCatalogo() {
@@ -108,15 +108,29 @@
             saveAs(blob, "juegos_seleccionados.csv");
         }
 
-        async function generarCSV() {
-            let seleccionados = document.querySelectorAll('.item.selected');
-            let nombres = Array.from(seleccionados).map(item => item.getAttribute('data-nombre'));
+     async function generarCSV() {
+    let seleccionados = document.querySelectorAll('.item.selected');
+    let nombres = Array.from(seleccionados).map(item => item.getAttribute('data-nombre'));
 
-            if (nombres.length === 0) {
-                alert("Seleccioná al menos un juego.");
-                return;
-            }
+    if (nombres.length === 0) {
+        alert("Seleccioná al menos un juego.");
+        return;
+    }
 
+    // Crear archivo CSV
+    let csvContent = nombres.join("\n");
+    let blob = new Blob([csvContent], { type: "text/csv" });
+    let file = new File([blob], "juegos_seleccionados.csv", { type: "text/csv" });
+
+    // Asignar archivo al input del formulario antes del envío
+    let fileInput = document.getElementById("csvFile");
+    let dataTransfer = new DataTransfer();
+    dataTransfer.items.add(file);
+    fileInput.files = dataTransfer.files;
+
+    // Enviar el formulario
+    document.getElementById("emailForm").submit();
+}
             // Crear archivo CSV
             let csvContent = nombres.join("\n");
             let blob = new Blob([csvContent], { type: "text/csv" });
