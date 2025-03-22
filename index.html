@@ -53,7 +53,7 @@
                 .then(data => {
                     let juegos = data.split('\n');
                     juegos.forEach((juego, index) => {
-                        if (index > 0 && juego.trim() !== '') {
+                        if (index > 0 && juego.trim() !== '') 
                             let partes = juego.split(',');
                             let nombre = partes[0].trim();
                             let codigo = partes[1].trim();
