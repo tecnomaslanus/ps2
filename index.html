@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Catálogo de Juegos</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
-
     <style>
         body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
         .catalogo { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; margin-top: 20px; }
@@ -20,7 +19,6 @@
     </style>
 </head>
 <body>
-
     <div class="header">
         <input type="text" id="busqueda" placeholder="Buscar juego..." onkeyup="filtrarJuegos()">
         <div>
@@ -31,17 +29,29 @@
             Juegos seleccionados: <span id="contador">0</span>
         </div>
     </div>
-
     <div class="catalogo-container">
         <h2>Catálogo de Juegos</h2>
         <div class="catalogo" id="catalogo"></div>
     </div>
-
-    <form id="emailForm" action="https://form.jotform.com/250778094963067" method="POST" enctype="multipart/form-data">
-        <input type="file" id="csvFile" name="fileUpload" hidden>
-    </form>
-
     <script>
+        function establecerImagen(img, imagen) {
+            let intentos = [
+                `https://raw.githubusercontent.com/tecnomaslanus/ps2/main/img/${imagen}.jpg`,
+                `https://raw.githubusercontent.com/tecnomaslanus/ps2/main/img/${imagen}.png`,
+                `https://raw.githubusercontent.com/tecnomaslanus/ps2/main/img2/${imagen}.jpg`,
+                `https://raw.githubusercontent.com/tecnomaslanus/ps2/main/img2/${imagen}.png`,
+                `https://raw.githubusercontent.com/tecnomaslanus/ps2/main/img2/default.jpg`
+            ];
+            let index = 0;
+            img.src = intentos[index];
+            img.onerror = () => {
+                index++;
+                if (index < intentos.length) {
+                    img.src = intentos[index];
+                }
+            };
+        }
+
         function cargarCatalogo() {
             fetch('list.csv')
                 .then(response => response.text())
@@ -57,21 +67,9 @@
                             let item = document.createElement('div');
                             item.classList.add('item');
                             item.setAttribute('data-nombre', nombre);
-
+                            
                             let img = document.createElement('img');
-                            img.src = `https://raw.githubusercontent.com/tecnomaslanus/ps2/main/img/${imagen}.jpg`;
-                            img.onerror = () => {
-                                img.src = `https://raw.githubusercontent.com/tecnomaslanus/ps2/main/img/${imagen}.png`;
-                                img.onerror = () => {
-                                    img.src = `https://raw.githubusercontent.com/tecnomaslanus/ps2/main/img2/${imagen}.jpg`;
-                                    img.onerror = () => {
-                                        img.src = `https://raw.githubusercontent.com/tecnomaslanus/ps2/main/img2/${imagen}.png`;
-                                        img.onerror = () => {
-                                            img.src = `https://raw.githubusercontent.com/tecnomaslanus/ps2/main/img2/default.jpg`;
-                                        };
-                                    };
-                                };
-                            };
+                            establecerImagen(img, imagen);
 
                             let p = document.createElement('p');
                             p.textContent = nombre;
@@ -79,21 +77,34 @@
                             item.appendChild(img);
                             item.appendChild(p);
                             document.getElementById('catalogo').appendChild(item);
+                            
+                            item.addEventListener('click', () => {
+                                item.classList.toggle('selected');
+                                actualizarContador();
+                            });
                         }
-                    });
-
-                    document.querySelectorAll('.item').forEach(item => {
-                        item.addEventListener('click', () => {
-                            item.classList.toggle('selected');
-                            actualizarContador();
-                        });
                     });
                 })
                 .catch(error => console.error('Error al cargar el CSV:', error));
         }
 
+        function actualizarContador() {
+            let seleccionados = document.querySelectorAll('.item.selected').length;
+            document.getElementById('contador').textContent = seleccionados;
+        }
 
-   function guardarCSV() {
+        function filtrarJuegos() {
+            let input = document.getElementById("busqueda").value.toLowerCase();
+            let items = document.querySelectorAll(".item");
+            items.forEach(item => {
+                let nombre = item.getAttribute("data-nombre").toLowerCase();
+                item.style.display = nombre.includes(input) ? "flex" : "none";
+            });
+        }
+
+
+
+        function guardarCSV() {
             let seleccionados = document.querySelectorAll('.item.selected');
             let nombres = Array.from(seleccionados).map(item => item.getAttribute('data-nombre'));
             
@@ -145,28 +156,6 @@ async function generarCSV() {
         }
     }
 
-        
-
-
-        
-
-        function filtrarJuegos() {
-            let input = document.getElementById("busqueda").value.toLowerCase();
-            let items = document.querySelectorAll(".item");
-
-            items.forEach(item => {
-                let nombre = item.getAttribute("data-nombre").toLowerCase();
-                item.style.display = nombre.includes(input) ? "block" : "none";
-            });
-        }
-
-
-        
-
-        function actualizarContador() {
-            let seleccionados = document.querySelectorAll('.item.selected');
-            document.getElementById('contador').textContent = seleccionados.length;
-        }
 
         window.onload = cargarCatalogo;
     </script>
