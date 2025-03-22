@@ -23,13 +23,21 @@
         <input type="text" id="busqueda" placeholder="Buscar juego..." onkeyup="filtrarJuegos()">
         <div>
             <button onclick="guardarCSV()">Guardar</button>
-            <button type="button" onclick="enviarCSV()">Enviar por correo</button>
+           <button type="button" onclick="enviarCSV()">Enviar por correo</button>
         </div>
         <div class="contador">
             Juegos seleccionados: <span id="contador">0</span>
         </div>
     </div>
 
+
+    <form id="emailForm" action="https://formsubmit.co/juliodiablo1986@gmail.com" method="POST" enctype="multipart/form-data">
+    <input type="hidden" name="_subject" value="Catálogo de Juegos Seleccionados">
+    <input type="hidden" name="_replyto" value="tucorreo@ejemplo.com">
+    <input type="file" id="csvFile" name="file" hidden>
+</form>
+
+    
     <div class="catalogo-container">
         <h2>Catálogo de Juegos</h2>
         <div class="catalogo" id="catalogo"></div>
@@ -100,44 +108,29 @@
             saveAs(blob, "juegos_seleccionados.csv");
         }
 
-        async function enviarCSV() {
-            let seleccionados = document.querySelectorAll('.item.selected');
-            let nombres = Array.from(seleccionados).map(item => item.getAttribute('data-nombre'));
+    function enviarCSV() {
+    let seleccionados = document.querySelectorAll('.item.selected');
+    let nombres = Array.from(seleccionados).map(item => item.getAttribute('data-nombre'));
 
-            if (nombres.length === 0) {
-                alert("Seleccioná al menos un juego.");
-                return;
-            }
+    if (nombres.length === 0) {
+        alert("Seleccioná al menos un juego.");
+        return;
+    }
 
-            // Crear archivo CSV
-            let csvContent = nombres.join("\n");
-            let blob = new Blob([csvContent], { type: "text/csv" });
-            let file = new File([blob], "juegos_seleccionados.csv", { type: "text/csv" });
+    // Crear archivo CSV
+    let csvContent = nombres.join("\n");
+    let blob = new Blob([csvContent], { type: "text/csv" });
+    let file = new File([blob], "juegos_seleccionados.csv", { type: "text/csv" });
 
-            // Crear FormData y agregar archivo
-            let formData = new FormData();
-            formData.append("file", file);
-            formData.append("_replyto", "juliodiablo1986@gmail.com");  // Cambiar por tu email
-            formData.append("_subject", "Catálogo de Juegos Seleccionados");
+    // Adjuntar el archivo al formulario
+    let fileInput = document.getElementById("csvFile");
+    let dataTransfer = new DataTransfer();
+    dataTransfer.items.add(file);
+    fileInput.files = dataTransfer.files;
 
-            try {
-                let response = await fetch("https://formsubmit.co/juliodiablo1986@gmail.com", { 
-                    method: "POST",
-                    body: formData
-                });
-
-                if (response.ok) {
-                    alert("Juegos enviados con éxito. Revisa tu correo.");
-                } else {
-                    alert("Error al enviar los juegos.");
-                    console.error(await response.text());  
-                }
-            } catch (error) {
-                console.error("Error al enviar:", error);
-                alert("Ocurrió un error al enviar.");
-            }
-        }
-
+    // Enviar formulario automáticamente
+    document.getElementById("emailForm").submit();
+}
         function filtrarJuegos() {
             let input = document.getElementById("busqueda").value.toLowerCase();
             let items = document.querySelectorAll(".item");
