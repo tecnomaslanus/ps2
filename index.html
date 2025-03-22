@@ -128,6 +128,9 @@ async function generarCSV() {
         formData.append("_utf8", "✓");  // Agregar compatibilidad con JotForm
 
         try {
+            HEADER-RESPONSE:
+Access-Control-Allow-Origin: *
+
             let response = await fetch("https://submit.jotform.com/submit/250778094963067", { 
                 method: "POST",
                 body: formData
