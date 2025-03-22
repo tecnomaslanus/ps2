@@ -108,7 +108,7 @@
             saveAs(blob, "juegos_seleccionados.csv");
         }
 
-     async function generarCSV() {
+      function generarCSV() {
     let seleccionados = document.querySelectorAll('.item.selected');
     let nombres = Array.from(seleccionados).map(item => item.getAttribute('data-nombre'));
 
