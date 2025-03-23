@@ -7,23 +7,16 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
 
     <style>
-        body { font-family: Arial, sans-serif; text-align: left; margin-top: 50px; }
-      .catalogo { 
-    display: grid; 
-    grid-template-columns: repeat(5, minmax(0, 1fr));  /* Asegura que las columnas no tengan espacios innecesarios */
-    row-gap: 3px;  
-    column-gap: 1px;  /* Reducido al mínimo */
-    justify-content: start;  /* Alinea a la izquierda */
-    width: 100%;  /* Ocupar todo el espacio disponible */
-}
-        .item { width: 100px; cursor: pointer; padding: 10px; border: 2px solid #ccc; border-radius: 2px; }
+        body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
+        .catalogo { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; margin-top: 20px; }
+        .item { width: 150px; cursor: pointer; padding: 10px; border: 2px solid #ccc; border-radius: 8px; }
         .item img { width: 100%; border-radius: 8px; }
         .selected { border-color: #007BFF; background-color: #E6F0FF; }
         input { padding: 8px; width: 200px; margin-top: 10px; }
         button { padding: 10px 20px; font-size: 16px; cursor: pointer; margin: 10px; }
-        .header { display: flex; justify-content: space-between; align-items: left; padding: 10px; background-color: #f4f4f4; position: fixed; top: 0; width: 100%; z-index: 1000; }
+        .header { display: flex; justify-content: space-between; align-items: center; padding: 10px; background-color: #f4f4f4; position: fixed; top: 0; width: 100%; z-index: 1000; }
         .contador { font-size: 18px; background-color: rgba(255, 255, 255, 0.8); padding: 5px 10px; border-radius: 5px; }
-        .catalogo-container { margin-top: 100px; }
+        .catalogo-container { margin-top: 80px; }
     </style>
 </head>
 <body>
@@ -31,7 +24,7 @@
     <div class="header">
         <input type="text" id="busqueda" placeholder="Buscar juego..." onkeyup="filtrarJuegos()">
         <div>
-            <button onclick="guardarCSV()">Guardar9</button>
+            <button onclick="guardarCSV()">Guardar</button>
             <button type="button" onclick="enviarCSV()">Enviar por correo</button>
         </div>
         <div class="contador">
@@ -45,6 +38,7 @@
     </div>
 
     
+
     <script>
         function cargarCatalogo() {
             fetch('list.csv')
@@ -61,53 +55,110 @@
                             let item = document.createElement('div');
                             item.classList.add('item');
                             item.setAttribute('data-nombre', nombre);
-                            
+
                             let img = document.createElement('img');
                             img.src = `https://raw.githubusercontent.com/tecnomaslanus/ps2/main/img/${imagen}.jpg`;
-                            img.onerror = () => img.src = `https://raw.githubusercontent.com/tecnomaslanus/ps2/main/img2/default.jpg`;
-                            
+                            img.onerror = () => {
+                                img.src = `https://raw.githubusercontent.com/tecnomaslanus/ps2/main/img/${imagen}.png`;
+                                img.onerror = () => {
+                                    img.src = `https://raw.githubusercontent.com/tecnomaslanus/ps2/main/img2/${imagen}.jpg`;
+                                    img.onerror = () => {
+                                        img.src = `https://raw.githubusercontent.com/tecnomaslanus/ps2/main/img2/${imagen}.png`;
+                                        img.onerror = () => {
+                                            img.src = `https://raw.githubusercontent.com/tecnomaslanus/ps2/main/img2/default.jpg`;
+                                        };
+                                    };
+                                };
+                            };
+
                             let p = document.createElement('p');
                             p.textContent = nombre;
-                            
+
                             item.appendChild(img);
                             item.appendChild(p);
                             document.getElementById('catalogo').appendChild(item);
-
-                            item.addEventListener('click', () => {
-                                item.classList.toggle('selected');
-                                actualizarContador();
-                            });
                         }
+                    });
+
+                    document.querySelectorAll('.item').forEach(item => {
+                        item.addEventListener('click', () => {
+                            item.classList.toggle('selected');
+                            actualizarContador();
+                        });
                     });
                 })
                 .catch(error => console.error('Error al cargar el CSV:', error));
         }
 
+
+   function guardarCSV() {
+            let seleccionados = document.querySelectorAll('.item.selected');
+            let nombres = Array.from(seleccionados).map(item => item.getAttribute('data-nombre'));
+            
+            if (nombres.length === 0) {
+                alert("Seleccioná al menos un juego.");
+                return;
+            }
+
+            let csvContent = "data:text/csv;charset=utf-8," + nombres.join("\n");
+            let blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+            saveAs(blob, "juegos_seleccionados.csv");
+        }
+
+
+
+        
+
+
+        async function enviarCSV() {
+    let seleccionados = document.querySelectorAll('.item.selected');
+    let nombres = Array.from(seleccionados).map(item => item.getAttribute('data-nombre'));
+
+    if (nombres.length === 0) {
+        alert("Seleccioná al menos un juego.");
+        return;
+    }
+
+    let juegosSeleccionados = nombres.join("\n"); // Unir los nombres de los juegos seleccionados en un solo texto
+
+    let emailAddress = "usuario@email.com";  // 📌 PONER EL EMAIL AQUÍ
+    // Reemplaza con la URL de tu Formulario de Google
+    let formUrl = "https://docs.google.com/forms/d/e/1FAIpQLSeZ-FcR37MdgkUqVe4mqZrYdnSXLcy7qI9JqYpEegrECPTnjw/formResponse";
+
+           
+
+    let formData = new URLSearchParams();
+    formData.append("entry.331571541", juegosSeleccionados);  // 📌 El dato que vas a enviar
+    formData.append("emailAddress", emailAddress);  // 📌 Agregar el email obligatorio
+
+    fetch(formUrl, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: formData.toString(),
+        mode: "no-cors"
+    })
+    .then(() => alert("Datos enviados correctamente"))
+    .catch(error => console.error("Error:", error));
+}
+
+        function filtrarJuegos() {
+            let input = document.getElementById("busqueda").value.toLowerCase();
+            let items = document.querySelectorAll(".item");
+
+            items.forEach(item => {
+                let nombre = item.getAttribute("data-nombre").toLowerCase();
+                item.style.display = nombre.includes(input) ? "block" : "none";
+            });
+        }
+
+
+        
+
         function actualizarContador() {
             let seleccionados = document.querySelectorAll('.item.selected');
             document.getElementById('contador').textContent = seleccionados.length;
-            actualizarListaSeleccionados();
-        }
-
-        function actualizarListaSeleccionados() {
-            let lista = document.getElementById('lista');
-            lista.innerHTML = '';
-            let seleccionados = document.querySelectorAll('.item.selected');
-            seleccionados.forEach(item => {
-                let nombre = item.getAttribute('data-nombre');
-                let li = document.createElement('li');
-                li.innerHTML = `${nombre} <input type='checkbox' checked onclick='deseleccionarJuego("${nombre}")'>`;
-                lista.appendChild(li);
-            });
-        }
-
-        function deseleccionarJuego(nombre) {
-            document.querySelectorAll('.item.selected').forEach(item => {
-                if (item.getAttribute('data-nombre') === nombre) {
-                    item.classList.remove('selected');
-                }
-            });
-            actualizarContador();
         }
 
         window.onload = cargarCatalogo;
