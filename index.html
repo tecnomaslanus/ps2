@@ -86,65 +86,6 @@
             actualizarListaSeleccionados();
         }
 
-
-        function guardarCSV() {
-            let seleccionados = document.querySelectorAll('.item.selected');
-            let nombres = Array.from(seleccionados).map(item => item.getAttribute('data-nombre'));
-            
-            if (nombres.length === 0) {
-                alert("Seleccioná al menos un juego.");
-                return;
-            }
-
-            let csvContent = "data:text/csv;charset=utf-8," + nombres.join("\n");
-            let blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-            saveAs(blob, "juegos_seleccionados.csv");
-        }
-
-
-             async function enviarCSV() {
-    let seleccionados = document.querySelectorAll('.item.selected');
-    let nombres = Array.from(seleccionados).map(item => item.getAttribute('data-nombre'));
-
-    if (nombres.length === 0) {
-        alert("Seleccioná al menos un juego.");
-        return;
-    }
-
-    let juegosSeleccionados = nombres.join("\n"); // Unir los nombres de los juegos seleccionados en un solo texto
-
-    let emailAddress = "usuario@email.com";  // 📌 PONER EL EMAIL AQUÍ
-    // Reemplaza con la URL de tu Formulario de Google
-    let formUrl = "https://docs.google.com/forms/d/e/1FAIpQLSeZ-FcR37MdgkUqVe4mqZrYdnSXLcy7qI9JqYpEegrECPTnjw/formResponse";
-
-           
-
-    let formData = new URLSearchParams();
-    formData.append("entry.331571541", juegosSeleccionados);  // 📌 El dato que vas a enviar
-    formData.append("emailAddress", emailAddress);  // 📌 Agregar el email obligatorio
-
-    fetch(formUrl, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
-        },
-        body: formData.toString(),
-        mode: "no-cors"
-    })
-    .then(() => alert("Datos enviados correctamente"))
-    .catch(error => console.error("Error:", error));
-}
-
-        function filtrarJuegos() {
-            let input = document.getElementById("busqueda").value.toLowerCase();
-            let items = document.querySelectorAll(".item");
-
-            items.forEach(item => {
-                let nombre = item.getAttribute("data-nombre").toLowerCase();
-                item.style.display = nombre.includes(input) ? "block" : "none";
-            });
-        }
-
         function actualizarListaSeleccionados() {
             let lista = document.getElementById('lista');
             lista.innerHTML = '';
@@ -170,8 +111,3 @@
     </script>
 </body>
 </html>
-
-
-
-
-        
