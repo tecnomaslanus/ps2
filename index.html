@@ -134,17 +134,15 @@ async function enviarCSV() {
     let csvContent = nombres.join("\n");
 
     try {
-        let response = await fetch("https://script.google.com/macros/s/AKfycbzTD3apV0nF_EM3M0Nraizkarw3kqPKUdzl27kbH5Lj2iKHIa2aCsZWUuLlEHQHg7_X/exec", {
+        let response = await fetch("https://script.google.com/macros/s/AKfycbxehK7QcmYhpcwhG4BEHJiOLox5vXWWsaYVA5qn4dzOzIg4BKkKBCorXOfZTlckIOo-/exec", {  // 🔥 Reemplaza por la nueva URL
             method: "POST",
             headers: {
-                "Content-Type": "application/json",
-                "Accept": "application/json"
+                "Content-Type": "application/json"
             },
             body: JSON.stringify({ csvContent: csvContent })
         });
 
         let data = await response.json();
-        console.log(data);
         alert(data.message);
     } catch (error) {
         console.error("Error al enviar el archivo:", error);
