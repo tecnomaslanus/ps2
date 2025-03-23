@@ -134,7 +134,7 @@ async function enviarCSV() {
     let csvContent = nombres.join("\n");
 
     // Reemplaza con la URL de tu Formulario de Google
-    let formUrl = "https://docs.google.com/forms/d/e/1FAIpQLSeZ-FcR37MdgkUqVe4mqZrYdnSXLcy7qI9JqYpEegrECPTnjw/viewform?usp=header/formResponse";
+    let formUrl = "https://docs.google.com/forms/d/e/1FAIpQLSeZ-FcR37MdgkUqVe4mqZrYdnSXLcy7qI9JqYpEegrECPTnjw/viewform?usp=header";
 
     let formData = new FormData();
     formData.append("entry.331571541", csvContent);
