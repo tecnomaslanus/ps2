@@ -136,23 +136,20 @@ async function enviarCSV() {
     // Reemplaza con la URL de tu Formulario de Google
     let formUrl = "https://docs.google.com/forms/d/e/1FAIpQLSeZ-FcR37MdgkUqVe4mqZrYdnSXLcy7qI9JqYpEegrECPTnjw/formResponse";
 
-    let formData = new FormData();
-    formData.append("entry.331571541", csvContent);
+  let formData = new URLSearchParams();
+formData.append("entry.3315711541", "csvContent");  // 📌 El dato que vas a enviar
+formData.append("emailAddress", "JUJU@GMAIL.COM");  // 📌 Agregar el email obligatorio
 
-    try {
-        let response = await fetch(formUrl, {
-            method: "POST",
-            body: formData,
-            mode: "no-cors"  // Evita CORS
-        });
-
-        alert("Datos enviados correctamente.");
-    } catch (error) {
-        console.error("Error al enviar:", error);
-        alert("Error al enviar.");
-    }
-}
-
+fetch("https://docs.google.com/forms/d/e/1FAIpQLSeZ-FcR37MdgkUqVe4mqZrYdnSXLcy7qI9JqYpEegrECPTnjw/formResponse", {
+    method: "POST",
+    headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+    },
+    body: formData.toString(),
+    mode: "no-cors"
+}).then(() => alert("Datos enviados correctamente"))
+  .catch(error => console.error("Error:", error));
+    
                  window.onload = cargarCatalogo;
     </script>
 </body>
