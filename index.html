@@ -37,10 +37,7 @@
         <div class="catalogo" id="catalogo"></div>
     </div>
 
-    <form id="emailForm" action="https://form.jotform.com/250778094963067" method="POST" enctype="multipart/form-data">
-        <input type="file" id="csvFile" name="fileUpload" hidden>
-    </form>
-
+ 
     <script>
 
 function establecerImagen(img, imagen) {
@@ -141,7 +138,7 @@ function establecerImagen(img, imagen) {
     formData.append("file", blob, "juegos_seleccionados.csv");
 
     try {
-        let response = await fetch("https://script.google.com/macros/s/1sPUdbJpfru8zHWOK7fpxl17960bt-4cJo0Xkce29fEpVgyIkkUoZVhIi/exec", {
+        let response = await fetch("https://script.google.com/macros/s/AKfycbzwDTvlxMSm7rtSDuFuccwCy4FlDpxBVW5KHGU9Cbtkn2wudChnM2UBlxr4BseSVQ/exec", {
             method: "POST",
             body: formData
         });
