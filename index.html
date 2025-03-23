@@ -1,3 +1,48 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catálogo de Juegos</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
+        .catalogo { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; margin-top: 20px; }
+        .item { width: 150px; cursor: pointer; padding: 10px; border: 2px solid #ccc; border-radius: 8px; }
+        .item img { width: 100%; border-radius: 8px; }
+        .selected { border-color: #007BFF; background-color: #E6F0FF; }
+        input { padding: 8px; width: 200px; margin-top: 10px; }
+        button { padding: 10px 20px; font-size: 16px; cursor: pointer; margin: 10px; }
+        .header { display: flex; justify-content: space-between; align-items: center; padding: 10px; background-color: #f4f4f4; position: fixed; top: 0; width: 100%; z-index: 1000; }
+        .contador { font-size: 18px; background-color: rgba(255, 255, 255, 0.8); padding: 5px 10px; border-radius: 5px; }
+        .catalogo-container { margin-top: 80px; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <input type="text" id="busqueda" placeholder="Buscar juego..." onkeyup="filtrarJuegos()">
+        <div>
+            <button onclick="guardarCSV()">Guardar</button>
+            <button type="button" onclick="generarCSV()">Enviar por correo</button>
+        </div>
+        <div class="contador">
+            Juegos seleccionados: <span id="contador">0</span>
+        </div>
+    </div>
+
+    <div class="catalogo-container">
+        <h2>Catálogo de Juegos</h2>
+        <div class="catalogo" id="catalogo"></div>
+    </div>
+
+    <form id="emailForm" action="https://form.jotform.com/250778094963067" method="POST" enctype="multipart/form-data">
+        <input type="file" id="csvFile" name="fileUpload" hidden>
+    </form>
+
+    <script>
+
 function establecerImagen(img, imagen) {
         let intentos = [
             `https://raw.githubusercontent.com/tecnomaslanus/ps2/main/img/${imagen}.jpg`,
@@ -113,3 +158,9 @@ function establecerImagen(img, imagen) {
             alert("Error al subir archivo.");
         }
     }
+
+                 window.onload = cargarCatalogo;
+    </script>
+</body>
+</html>
+
