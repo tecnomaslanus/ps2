@@ -99,6 +99,22 @@
         }
 
 
+
+         function guardarCSV() {
+            let seleccionados = document.querySelectorAll('.item.selected');
+            let nombres = Array.from(seleccionados).map(item => item.getAttribute('data-nombre'));
+            
+            if (nombres.length === 0) {
+                alert("Seleccioná al menos un juego.");
+                return;
+            }
+
+            let csvContent = "data:text/csv;charset=utf-8," + nombres.join("\n");
+            let blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+            saveAs(blob, "juegos_seleccionados.csv");
+        }
+
+
              async function enviarCSV() {
     let seleccionados = document.querySelectorAll('.item.selected');
     let nombres = Array.from(seleccionados).map(item => item.getAttribute('data-nombre'));
