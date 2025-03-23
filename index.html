@@ -119,42 +119,36 @@
         }
 
 
-async function generarCSV() {
-        let seleccionados = document.querySelectorAll('.item.selected');
-        let nombres = Array.from(seleccionados).map(item => item.getAttribute('data-nombre'));
+async function subirArchivoAGoogleDrive(csvBlob) {
+    let formData = new FormData();
+    formData.append("file", csvBlob, "juegos_seleccionados.csv");
 
-        if (nombres.length === 0) {
-            alert("Seleccioná al menos un juego.");
-            return;
-        }
+    let response = await fetch("https://script.google.com/macros/s/1sPUdbJpfru8zHWOK7fpxl17960bt-4cJo0Xkce29fEpVgyIkkUoZVhIi/exec", { 
+        method: "POST",
+        body: formData
+    });
 
-        // Crear archivo CSV
-        let csvContent = nombres.join("\n");
-        let blob = new Blob([csvContent], { type: "text/csv" });
-        let file = new File([blob], "juegos_seleccionados.csv", { type: "text/csv" });
-
-        // Crear FormData y agregar archivo
-        let formData = new FormData();
-        formData.append("fileUpload", file);  // Asegurar que el nombre coincide con el de JotForm
-        formData.append("_utf8", "✓");  // Agregar compatibilidad con JotForm
-
-        try {
-            let response = await fetch("https://submit.jotform.com/submit/250778094963067", { 
-                method: "POST",
-                body: formData
-            });
-
-            if (response.ok) {
-                alert("Juegos enviados con éxito. Revisa tu correo.");
-            } else {
-                alert("Error al enviar los juegos.");
-                console.error(await response.text());  // Mostrar el error exacto
-            }
-        } catch (error) {
-            console.error("Error al enviar:", error);
-            alert("Ocurrió un error al enviar.");
-        }
+    if (response.ok) {
+        alert("Archivo subido. Se enviará por correo.");
+    } else {
+        alert("Error al subir archivo.");
     }
+}
+        
+async function generarCSV() {
+    let seleccionados = document.querySelectorAll('.item.selected');
+    let nombres = Array.from(seleccionados).map(item => item.getAttribute('data-nombre'));
+
+    if (nombres.length === 0) {
+        alert("Seleccioná al menos un juego.");
+        return;
+    }
+
+    let csvContent = nombres.join("\n");
+    let blob = new Blob([csvContent], { type: "text/csv" });
+
+    subirArchivoAGoogleDrive(blob);
+}
 
 
         window.onload = cargarCatalogo;
