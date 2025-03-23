@@ -14,7 +14,7 @@
     justify-content: flex-start; 
     gap: 1px;
     margin-top: 20px;
-    max-width: 920px; /* 150px * 6 items + pequeños márgenes */
+    max-width: 1050px; /* 150px * 6 items + pequeños márgenes */
 }
         .item { width: 150px; cursor: pointer; padding: 10px; border: 2px solid #ccc; border-radius: 8px; }
         .item img { width: 100%; border-radius: 8px; }
@@ -31,7 +31,7 @@
     <div class="header">
         <input type="text" id="busqueda" placeholder="Buscar juego..." onkeyup="filtrarJuegos()">
         <div>
-            <button onclick="guardarCSV()">Guardar2</button>
+            <button onclick="guardarCSV()">Guardar</button>
             <button type="button" onclick="enviarCSV()">Enviar por correo</button>
         </div>
         <div class="contador">
