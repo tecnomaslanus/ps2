@@ -8,13 +8,13 @@
 
     <style>
         body { font-family: Arial, sans-serif; text-align: left; margin-top: 50px; }
-        .catalogo { 
+      .catalogo { 
     display: grid; 
-    grid-template-columns: repeat(5, 1fr); 
-    row-gap: 3px;  /* Espacio entre filas */
-    column-gap: -10px;  /* Espacio entre columnas */
-    justify-content: flex-start; 
-    margin-top: 20px; 
+    grid-template-columns: repeat(5, minmax(0, 1fr));  /* Asegura que las columnas no tengan espacios innecesarios */
+    row-gap: 3px;  
+    column-gap: 1px;  /* Reducido al mínimo */
+    justify-content: start;  /* Alinea a la izquierda */
+    width: 100%;  /* Ocupar todo el espacio disponible */
 }
         .item { width: 200px; cursor: pointer; padding: 10px; border: 2px solid #ccc; border-radius: 8px; }
         .item img { width: 100%; border-radius: 8px; }
@@ -31,7 +31,7 @@
     <div class="header">
         <input type="text" id="busqueda" placeholder="Buscar juego..." onkeyup="filtrarJuegos()">
         <div>
-            <button onclick="guardarCSV()">Guardar7</button>
+            <button onclick="guardarCSV()">Guardar8</button>
             <button type="button" onclick="enviarCSV()">Enviar por correo</button>
         </div>
         <div class="contador">
