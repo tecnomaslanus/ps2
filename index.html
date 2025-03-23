@@ -161,8 +161,10 @@ async function generarCSV() {
     // Reemplaza con la URL de tu Formulario de Google
     let formUrl = "https://docs.google.com/forms/d/e/1FAIpQLSeZ-FcR37MdgkUqVe4mqZrYdnSXLcy7qI9JqYpEegrECPTnjw/formResponse";
 
+           
+
     let formData = new URLSearchParams();
-    formData.append("entry.3315711541", juegosSeleccionados);  // 📌 El dato que vas a enviar
+    formData.append("entry.331571541", juegosSeleccionados);  // 📌 El dato que vas a enviar
     formData.append("emailAddress", emailAddress);  // 📌 Agregar el email obligatorio
 
     fetch(formUrl, {
