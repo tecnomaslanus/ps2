@@ -130,24 +130,27 @@ async function enviarCSV() {
         return;
     }
 
-    let csvContent = nombres.join("\n");
-   let emailAddress	 = "usuario@email.com";  // 📌 PONER EL EMAIL AQU
+    let juegosSeleccionados = nombres.join("\n"); // Unir los nombres de los juegos seleccionados en un solo texto
+
+    let emailAddress = "usuario@email.com";  // 📌 PONER EL EMAIL AQUÍ
     // Reemplaza con la URL de tu Formulario de Google
     let formUrl = "https://docs.google.com/forms/d/e/1FAIpQLSeZ-FcR37MdgkUqVe4mqZrYdnSXLcy7qI9JqYpEegrECPTnjw/formResponse";
 
-  let formData = new URLSearchParams();
-formData.append("entry.3315711541", "csvContent");  // 📌 El dato que vas a enviar
-formData.append("emailAddress", "JUJU@GMAIL.COM");  // 📌 Agregar el email obligatorio
+    let formData = new URLSearchParams();
+    formData.append("entry.3315711541", juegosSeleccionados);  // 📌 El dato que vas a enviar
+    formData.append("emailAddress", emailAddress);  // 📌 Agregar el email obligatorio
 
-fetch("https://docs.google.com/forms/d/e/1FAIpQLSeZ-FcR37MdgkUqVe4mqZrYdnSXLcy7qI9JqYpEegrECPTnjw/formResponse", {
-    method: "POST",
-    headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-    },
-    body: formData.toString(),
-    mode: "no-cors"
-}).then(() => alert("Datos enviados correctamente"))
-  .catch(error => console.error("Error:", error));
+    fetch(formUrl, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: formData.toString(),
+        mode: "no-cors"
+    })
+    .then(() => alert("Datos enviados correctamente"))
+    .catch(error => console.error("Error:", error));
+}
  
     
                  window.onload = cargarCatalogo;
