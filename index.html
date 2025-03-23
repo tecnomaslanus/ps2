@@ -37,91 +37,116 @@
         <div class="catalogo" id="catalogo"></div>
     </div>
 
- 
+    
+
     <script>
+        function cargarCatalogo() {
+            fetch('list.csv')
+                .then(response => response.text())
+                .then(data => {
+                    let juegos = data.split('\n');
+                    juegos.forEach((juego, index) => {
+                        if (index > 0 && juego.trim() !== '') {
+                            let partes = juego.split(',');
+                            let nombre = partes[0].trim();
+                            let codigo = partes[1].trim();
+                            let imagen = `${codigo}_COV`;
 
-function establecerImagen(img, imagen) {
-        let intentos = [
-            `https://raw.githubusercontent.com/tecnomaslanus/ps2/main/img/${imagen}.jpg`,
-            `https://raw.githubusercontent.com/tecnomaslanus/ps2/main/img/${imagen}.png`,
-            `https://raw.githubusercontent.com/tecnomaslanus/ps2/main/img2/${imagen}.jpg`,
-            `https://raw.githubusercontent.com/tecnomaslanus/ps2/main/img2/${imagen}.png`,
-            `https://raw.githubusercontent.com/tecnomaslanus/ps2/main/img2/default.jpg`
-        ];
-        let index = 0;
-        img.src = intentos[index];
-        img.onerror = () => {
-            index++;
-            if (index < intentos.length) {
-                img.src = intentos[index];
-            }
-        };
-    }
+                            let item = document.createElement('div');
+                            item.classList.add('item');
+                            item.setAttribute('data-nombre', nombre);
 
-    function cargarCatalogo() {
-        fetch('list.csv')
-            .then(response => response.text())
-            .then(data => {
-                let juegos = data.split('\n');
-                juegos.forEach((juego, index) => {
-                    if (index > 0 && juego.trim() !== '') {
-                        let partes = juego.split(',');
-                        let nombre = partes[0].trim();
-                        let codigo = partes[1].trim();
-                        let imagen = `${codigo}_COV`;
+                            let img = document.createElement('img');
+                            img.src = `https://raw.githubusercontent.com/tecnomaslanus/ps2/main/img/${imagen}.jpg`;
+                            img.onerror = () => {
+                                img.src = `https://raw.githubusercontent.com/tecnomaslanus/ps2/main/img/${imagen}.png`;
+                                img.onerror = () => {
+                                    img.src = `https://raw.githubusercontent.com/tecnomaslanus/ps2/main/img2/${imagen}.jpg`;
+                                    img.onerror = () => {
+                                        img.src = `https://raw.githubusercontent.com/tecnomaslanus/ps2/main/img2/${imagen}.png`;
+                                        img.onerror = () => {
+                                            img.src = `https://raw.githubusercontent.com/tecnomaslanus/ps2/main/img2/default.jpg`;
+                                        };
+                                    };
+                                };
+                            };
 
-                        let item = document.createElement('div');
-                        item.classList.add('item');
-                        item.setAttribute('data-nombre', nombre);
-                        
-                        let img = document.createElement('img');
-                        establecerImagen(img, imagen);
+                            let p = document.createElement('p');
+                            p.textContent = nombre;
 
-                        let p = document.createElement('p');
-                        p.textContent = nombre;
+                            item.appendChild(img);
+                            item.appendChild(p);
+                            document.getElementById('catalogo').appendChild(item);
+                        }
+                    });
 
-                        item.appendChild(img);
-                        item.appendChild(p);
-                        document.getElementById('catalogo').appendChild(item);
-                        
+                    document.querySelectorAll('.item').forEach(item => {
                         item.addEventListener('click', () => {
                             item.classList.toggle('selected');
                             actualizarContador();
                         });
-                    }
-                });
-            })
-            .catch(error => console.error('Error al cargar el CSV:', error));
-    }
+                    });
+                })
+                .catch(error => console.error('Error al cargar el CSV:', error));
+        }
 
-    function actualizarContador() {
-        let seleccionados = document.querySelectorAll('.item.selected').length;
-        document.getElementById('contador').textContent = seleccionados;
-    }
 
-    function filtrarJuegos() {
-        let input = document.getElementById("busqueda").value.toLowerCase();
-        let items = document.querySelectorAll(".item");
-        items.forEach(item => {
-            let nombre = item.getAttribute("data-nombre").toLowerCase();
-            item.style.display = nombre.includes(input) ? "flex" : "none";
-        });
-    }
+   function guardarCSV() {
+            let seleccionados = document.querySelectorAll('.item.selected');
+            let nombres = Array.from(seleccionados).map(item => item.getAttribute('data-nombre'));
+            
+            if (nombres.length === 0) {
+                alert("Seleccioná al menos un juego.");
+                return;
+            }
 
-    function guardarCSV() {
+            let csvContent = "data:text/csv;charset=utf-8," + nombres.join("\n");
+            let blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+            saveAs(blob, "juegos_seleccionados.csv");
+        }
+
+
+async function generarCSV() {
         let seleccionados = document.querySelectorAll('.item.selected');
         let nombres = Array.from(seleccionados).map(item => item.getAttribute('data-nombre'));
-        
+
         if (nombres.length === 0) {
             alert("Seleccioná al menos un juego.");
             return;
+        }
 
-        let csvContent = "data:text/csv;charset=utf-8," + nombres.join("\n");
-        let blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-        saveAs(blob, "juegos_seleccionados.csv");
+        // Crear archivo CSV
+        let csvContent = nombres.join("\n");
+        let blob = new Blob([csvContent], { type: "text/csv" });
+        let file = new File([blob], "juegos_seleccionados.csv", { type: "text/csv" });
+
+        // Crear FormData y agregar archivo
+        let formData = new FormData();
+        formData.append("fileUpload", file);  // Asegurar que el nombre coincide con el de JotForm
+        formData.append("_utf8", "✓");  // Agregar compatibilidad con JotForm
+
+        try {
+            let response = await fetch("https://submit.jotform.com/submit/250778094963067", { 
+                method: "POST",
+                body: formData
+            });
+
+            if (response.ok) {
+                alert("Juegos enviados con éxito. Revisa tu correo.");
+            } else {
+                alert("Error al enviar los juegos.");
+                console.error(await response.text());  // Mostrar el error exacto
+            }
+        } catch (error) {
+            console.error("Error al enviar:", error);
+            alert("Ocurrió un error al enviar.");
+        }
     }
 
-async function enviarCSV() {
+        
+
+
+        async function enviarCSV() {
     let seleccionados = document.querySelectorAll('.item.selected');
     let nombres = Array.from(seleccionados).map(item => item.getAttribute('data-nombre'));
 
@@ -151,10 +176,26 @@ async function enviarCSV() {
     .then(() => alert("Datos enviados correctamente"))
     .catch(error => console.error("Error:", error));
 }
- 
-    
-                 window.onload = cargarCatalogo;
+
+        function filtrarJuegos() {
+            let input = document.getElementById("busqueda").value.toLowerCase();
+            let items = document.querySelectorAll(".item");
+
+            items.forEach(item => {
+                let nombre = item.getAttribute("data-nombre").toLowerCase();
+                item.style.display = nombre.includes(input) ? "block" : "none";
+            });
+        }
+
+
+        
+
+        function actualizarContador() {
+            let seleccionados = document.querySelectorAll('.item.selected');
+            document.getElementById('contador').textContent = seleccionados.length;
+        }
+
+        window.onload = cargarCatalogo;
     </script>
 </body>
 </html>
-
