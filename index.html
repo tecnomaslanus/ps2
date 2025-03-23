@@ -125,39 +125,35 @@ function establecerImagen(img, imagen) {
         saveAs(blob, "juegos_seleccionados.csv");
     }
 
-    // Función para enviar el archivo CSV al script de Google Apps
-    async function generarCSV() {
-        let seleccionados = document.querySelectorAll('.item.selected');
-        let nombres = Array.from(seleccionados).map(item => item.getAttribute('data-nombre'));
+  async function enviarCSV() {
+    let seleccionados = document.querySelectorAll('.item.selected');
+    let nombres = Array.from(seleccionados).map(item => item.getAttribute('data-nombre'));
 
-        if (nombres.length === 0) {
-            alert("Seleccioná al menos un juego.");
-            return;
-        }
-
-        let csvContent = nombres.join("\n");
-        let blob = new Blob([csvContent], { type: "text/csv" });
-
-        // Llamada a la función que sube el archivo a Google Apps Script
-        await subirArchivoAGoogleDrive(blob);
+    if (nombres.length === 0) {
+        alert("Seleccioná al menos un juego.");
+        return;
     }
 
-    // Función para subir el archivo CSV a Google Apps Script
-    async function subirArchivoAGoogleDrive(csvBlob) {
-        let formData = new FormData();
-        formData.append("file", csvBlob, "juegos_seleccionados.csv");
+    let csvContent = nombres.join("\n");
+    let blob = new Blob([csvContent], { type: "text/csv" });
+    
+    let formData = new FormData();
+    formData.append("file", blob, "juegos_seleccionados.csv");
 
-        let response = await fetch("https://script.google.com/macros/s/AKfycbx4VHT3rP12N_p5CSbOr6B18Q-LpcNqlP6bQH5gza7qnWayr3X6152cJysgSQ_0zXah/exec", { 
+    try {
+        let response = await fetch("https://script.google.com/macros/s/1sPUdbJpfru8zHWOK7fpxl17960bt-4cJo0Xkce29fEpVgyIkkUoZVhIi/exec", {
             method: "POST",
             body: formData
         });
 
-        if (response.ok) {
-            alert("Archivo subido. Se enviará por correo.");
-        } else {
-            alert("Error al subir archivo.");
-        }
+        let data = await response.json();
+        console.log(data);
+        alert(data.message);
+    } catch (error) {
+        console.error("Error al enviar el archivo:", error);
+        alert("Error al enviar el archivo.");
     }
+}
 
                  window.onload = cargarCatalogo;
     </script>
