@@ -12,7 +12,7 @@
     display: grid; 
     grid-template-columns: repeat(5, 1fr); 
     row-gap: 3px;  /* Espacio entre filas */
-    column-gap: 1px;  /* Espacio entre columnas */
+    column-gap: -10px;  /* Espacio entre columnas */
     justify-content: flex-start; 
     margin-top: 20px; 
 }
@@ -31,7 +31,7 @@
     <div class="header">
         <input type="text" id="busqueda" placeholder="Buscar juego..." onkeyup="filtrarJuegos()">
         <div>
-            <button onclick="guardarCSV()">Guardar2</button>
+            <button onclick="guardarCSV()">Guardar3</button>
             <button type="button" onclick="enviarCSV()">Enviar por correo</button>
         </div>
         <div class="contador">
