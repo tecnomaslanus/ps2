@@ -8,7 +8,14 @@
 
     <style>
         body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
-        .catalogo { display: flex; flex-wrap: wrap; justify-content: center; gap: 1px; margin-top: 20px; }
+       .catalogo { 
+    display: flex; 
+    flex-wrap: wrap; 
+    justify-content: flex-start; 
+    gap: 1px;
+    margin-top: 20px;
+    max-width: 920px; /* 150px * 6 items + pequeños márgenes */
+}
         .item { width: 150px; cursor: pointer; padding: 10px; border: 2px solid #ccc; border-radius: 8px; }
         .item img { width: 100%; border-radius: 8px; }
         .selected { border-color: #007BFF; background-color: #E6F0FF; }
@@ -24,7 +31,7 @@
     <div class="header">
         <input type="text" id="busqueda" placeholder="Buscar juego..." onkeyup="filtrarJuegos()">
         <div>
-            <button onclick="guardarCSV()">Guardar1</button>
+            <button onclick="guardarCSV()">Guardar2</button>
             <button type="button" onclick="enviarCSV()">Enviar por correo</button>
         </div>
         <div class="contador">
