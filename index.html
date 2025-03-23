@@ -133,20 +133,23 @@ async function enviarCSV() {
 
     let csvContent = nombres.join("\n");
 
+    // Reemplaza con la URL de tu Formulario de Google
+    let formUrl = "https://docs.google.com/forms/d/e/1FAIpQLSeZ-FcR37MdgkUqVe4mqZrYdnSXLcy7qI9JqYpEegrECPTnjw/viewform?usp=header/formResponse";
+
+    let formData = new FormData();
+    formData.append("entry.331571541", csvContent);
+
     try {
-        let response = await fetch("https://script.google.com/macros/s/AKfycbxehK7QcmYhpcwhG4BEHJiOLox5vXWWsaYVA5qn4dzOzIg4BKkKBCorXOfZTlckIOo-/exec", {  // 🔥 Reemplaza por la nueva URL
+        let response = await fetch(formUrl, {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ csvContent: csvContent })
+            body: formData,
+            mode: "no-cors"  // Evita CORS
         });
 
-        let data = await response.json();
-        alert(data.message);
+        alert("Datos enviados correctamente.");
     } catch (error) {
-        console.error("Error al enviar el archivo:", error);
-        alert("Error al enviar el archivo.");
+        console.error("Error al enviar:", error);
+        alert("Error al enviar.");
     }
 }
 
