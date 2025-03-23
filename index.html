@@ -22,7 +22,7 @@
         input { padding: 8px; width: 200px; margin-top: 10px; }
         button { padding: 10px 20px; font-size: 16px; cursor: pointer; margin: 10px; }
         .header { display: flex; justify-content: space-between; align-items: center; padding: 10px; background-color: #f4f4f4; position: fixed; top: 0; width: 100%; z-index: 1000; }
-        .contador { font-size: 18px; background-color: rgba(255, 255, 255, 0.8); padding: 5px 10px; border-radius: 5px; }
+        .contador { font-size: 18px; background-color: rgba(255, 255, 255, 0.8); padding: 5px 10px; border-radius: 5px; margin-left: 10px; }
         .catalogo-container { margin-top: 80px; }
     </style>
 </head>
@@ -31,7 +31,7 @@
     <div class="header">
         <input type="text" id="busqueda" placeholder="Buscar juego..." onkeyup="filtrarJuegos()">
         <div>
-            <button onclick="guardarCSV()">Guardar</button>
+            <button onclick="guardarCSV()">Guardar1</button>
             <button type="button" onclick="enviarCSV()">Enviar por correo</button>
         </div>
         <div class="contador">
