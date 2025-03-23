@@ -122,7 +122,7 @@ function establecerImagen(img, imagen) {
         saveAs(blob, "juegos_seleccionados.csv");
     }
 
-  async function enviarCSV() {
+ async function enviarCSV() {
     let seleccionados = document.querySelectorAll('.item.selected');
     let nombres = Array.from(seleccionados).map(item => item.getAttribute('data-nombre'));
 
@@ -133,14 +133,17 @@ function establecerImagen(img, imagen) {
 
     let csvContent = nombres.join("\n");
     let blob = new Blob([csvContent], { type: "text/csv" });
-    
+
     let formData = new FormData();
     formData.append("file", blob, "juegos_seleccionados.csv");
 
     try {
         let response = await fetch("https://script.google.com/macros/s/AKfycbzwDTvlxMSm7rtSDuFuccwCy4FlDpxBVW5KHGU9Cbtkn2wudChnM2UBlxr4BseSVQ/exec", {
             method: "POST",
-            body: formData
+            body: formData,
+            headers: {
+                "Accept": "application/json"
+            }
         });
 
         let data = await response.json();
