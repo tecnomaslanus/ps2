@@ -123,7 +123,7 @@ async function subirArchivoAGoogleDrive(csvBlob) {
     let formData = new FormData();
     formData.append("file", csvBlob, "juegos_seleccionados.csv");
 
-    let response = await fetch("https://script.google.com/macros/s/1sPUdbJpfru8zHWOK7fpxl17960bt-4cJo0Xkce29fEpVgyIkkUoZVhIi/exec", { 
+    let response = await fetch("https://script.google.com/macros/s/AKfycbyZyMLUQ5hNCt_KNbvtc2UR8eygerZwamBj0RlU9N0Yf8564VmRtoxaP49wPfouNGlP/exec", { 
         method: "POST",
         body: formData
     });
