@@ -7,7 +7,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
 
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
+       body { font-family: nunito; text-align: center; margin-top: 50px; }
        .catalogo { 
     display: flex; 
     flex-wrap: wrap; 
@@ -39,6 +39,24 @@
     padding: 5px;
     border-radius: 5px;
 }
+
+        button {
+  background-color: #ffcb03; /* Green */
+  border: none;
+  color: #5d2783;
+  padding: 15px 15px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  border-radius: 8px;
+  font-size: 18px;
+  transition-duration: 0.4s;
+}
+
+    button:hover{
+        background-color: #ffdd5a;
+  color: #5d2783;
+    }
 
 .seleccionados-container {
             position: fixed;
@@ -89,7 +107,7 @@
             <label><input type="checkbox" id="filterPS2" onchange="filtrarJuegos()"> PS2</label>
         </div>
         <div>
-            <button onclick="guardarCSV()">Guardar</button>
+            <button onclick="guardarCSV()">Guardar1</button>
             <button type="button" onclick="enviarCSV()">Enviar por correo</button>
         </div>
         <div class="contador">
