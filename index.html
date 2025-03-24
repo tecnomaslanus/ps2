@@ -54,15 +54,29 @@
         }
         .seleccionados-container h3 { margin: 0; padding-bottom: 10px; }
         .seleccionados-container ul { list-style-type: none; padding: 0; }
+
+
         .seleccionados-container li {
-            display: grid;
-            align-items: center;
-            grid-template-columns: auto auto;
-            justify-content: flex-start;
-            gap: 10px;
-            margin-bottom: 10px;
-        }
-        
+    display: grid;
+    align-items: center;
+    grid-template-columns: 25px auto; /* Checkbox fijo, texto flexible */
+    gap: 10px;
+    margin-bottom: 10px;
+    overflow: hidden; /* Evita desbordamiento */
+}
+
+.seleccionados-container li input {
+    width: 15px; /* Tamaño fijo del checkbox */
+    height: 20px;
+}
+
+.seleccionados-container li span {
+    white-space: nowrap; /* Evita saltos de línea */
+    overflow: hidden;
+    text-overflow: ellipsis; /* Agrega "..." si el texto es muy largo */
+    display: block;
+    max-width: 200px; /* Ajusta el ancho máximo según necesites */
+}
         .catalogo-container { margin-top: 80px; }
     </style>
 </head>
@@ -75,7 +89,7 @@
             <label><input type="checkbox" id="filterPS2" onchange="filtrarJuegos()"> PS2</label>
         </div>
         <div>
-            <button onclick="guardarCSV()">Guardar3</button>
+            <button onclick="guardarCSV()">Guardar</button>
             <button type="button" onclick="enviarCSV()">Enviar por correo</button>
         </div>
         <div class="contador">
