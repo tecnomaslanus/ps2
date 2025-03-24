@@ -55,9 +55,8 @@
         .seleccionados-container h3 { margin: 0; padding-bottom: 10px; }
         .seleccionados-container ul { list-style-type: none; padding: 0; }
         .seleccionados-container li {
-            display: flex;
-            align-items: center;
-            justify-content: flex-start;
+            display: grid;
+  grid-template-columns: auto auto;
             gap: 10px;
             margin-bottom: 10px;
         }
@@ -74,7 +73,7 @@
             <label><input type="checkbox" id="filterPS2" onchange="filtrarJuegos()"> PS2</label>
         </div>
         <div>
-            <button onclick="guardarCSV()">Guardar1</button>
+            <button onclick="guardarCSV()">Guardar2</button>
             <button type="button" onclick="enviarCSV()">Enviar por correo</button>
         </div>
         <div class="contador">
