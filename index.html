@@ -61,6 +61,10 @@
 
     <div class="header">
         <input type="text" id="busqueda" placeholder="Buscar juego..." onkeyup="filtrarJuegos()">
+<div class="filters">
+            <label><input type="checkbox" id="filterPS1" onchange="filtrarJuegos()"> PS1</label>
+            <label><input type="checkbox" id="filterPS2" onchange="filtrarJuegos()"> PS2</label>
+        </div>
         <div>
             <button onclick="guardarCSV()">Guardar1</button>
             <button type="button" onclick="enviarCSV()">Enviar por correo</button>
@@ -131,7 +135,21 @@
                 .catch(error => console.error('Error al cargar el CSV:', error));
         }
 
+  function filtrarJuegos() {
+            let input = document.getElementById("busqueda").value.toLowerCase();
+            let filterPS1 = document.getElementById("filterPS1").checked;
+            let filterPS2 = document.getElementById("filterPS2").checked;
+            let items = document.querySelectorAll(".item");
 
+            items.forEach(item => {
+                let nombre = item.getAttribute("data-nombre").toLowerCase();
+                let tipo = item.getAttribute("data-tipo");
+                let matchTexto = nombre.includes(input);
+                let matchFiltro = (!filterPS1 && !filterPS2) || (filterPS1 && tipo === "CD") || (filterPS2 && tipo === "DVD");
+                
+                item.style.display = matchTexto && matchFiltro ? "block" : "none";
+            });
+        }
    function guardarCSV() {
             let seleccionados = document.querySelectorAll('.item.selected');
             let nombres = Array.from(seleccionados).map(item => item.getAttribute('data-nombre'));
