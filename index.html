@@ -32,6 +32,14 @@
     top: 15px; /* Ajusta la posición vertical para alinearlo con los otros elementos */
 }
 
+        filters {
+    display: flex;
+    gap: 10px;
+    background-color: #fff; /* Opcional, fondo blanco */
+    padding: 5px;
+    border-radius: 5px;
+}
+
 .seleccionados-container {
             position: fixed;
             top: 80px;
@@ -66,7 +74,7 @@
             <label><input type="checkbox" id="filterPS2" onchange="filtrarJuegos()"> PS2</label>
         </div>
         <div>
-            <button onclick="guardarCSV()">Guardar</button>
+            <button onclick="guardarCSV()">Guardar1</button>
             <button type="button" onclick="enviarCSV()">Enviar por correo</button>
         </div>
         <div class="contador">
