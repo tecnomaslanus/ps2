@@ -61,7 +61,7 @@
     <div class="header">
         <input type="text" id="busqueda" placeholder="Buscar juego..." onkeyup="filtrarJuegos()">
         <div>
-            <button onclick="guardarCSV()">Guardar3</button>
+            <button onclick="guardarCSV()">Guardar</button>
             <button type="button" onclick="enviarCSV()">Enviar por correo</button>
         </div>
         <div class="contador">
@@ -146,7 +146,21 @@
         }
 
 
-
+  function actualizarListaSeleccionados() {
+            let lista = document.getElementById("lista-seleccionados");
+            lista.innerHTML = "";
+            document.querySelectorAll(".item.selected").forEach(item => {
+                let nombre = item.getAttribute("data-nombre");
+                let li = document.createElement("li");
+                let checkbox = document.createElement("input");
+                checkbox.type = "checkbox";
+                checkbox.checked = true;
+                checkbox.onclick = () => deseleccionarJuego(nombre);
+                li.appendChild(checkbox);
+                li.appendChild(document.createTextNode(" " + nombre));
+                lista.appendChild(li);
+            });
+        }
         
 
 
@@ -204,9 +218,10 @@
 
         
 
-        function actualizarContador() {
+          function actualizarContador() {
             let seleccionados = document.querySelectorAll('.item.selected');
             document.getElementById('contador').textContent = seleccionados.length;
+            actualizarListaSeleccionados();
         }
 
         window.onload = cargarCatalogo;
