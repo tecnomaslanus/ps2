@@ -114,23 +114,25 @@
 <body>
     
     <div class="header">
+
+    <div>
+    <input type="text" id="nombre" placeholder="Tu nombre">
+    <input type="email" id="email" placeholder="Tu correo electrónico">
+</div>
         <input type="text" id="busqueda" placeholder="Buscar juego..." onkeyup="filtrarJuegos()">
 <div class="filters">
             <label><input type="checkbox" id="filterPS1" onchange="filtrarJuegos()"> PS1</label>
             <label><input type="checkbox" id="filterPS2" onchange="filtrarJuegos()"> PS2</label>
         </div>
         <div>
-            <button onclick="guardarCSV()">Guardar123</button>
+            <button onclick="guardarCSV()">Guardar</button>
             <button type="button" onclick="enviarCSV()">Enviar por correo</button>
         </div>
         <div class="contador">
             Juegos seleccionados: <span id="contador">0</span>
         </div>
     </div>
-<div>
-    <input type="text" id="nombre" placeholder="Tu nombre">
-    <input type="email" id="email" placeholder="Tu correo electrónico">
-</div>
+
 <button class="toggle-button" onclick="toggleSeleccionados()">Mostrar/Ocultar</button>
 <button onclick="enviarCSV()">Enviar por correo</button>
     <div class="catalogo-container">
