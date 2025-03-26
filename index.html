@@ -66,8 +66,26 @@
         max-height: 80vh;
         overflow-y: auto;
         box-shadow: -2px 2px 10px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease-in-out;
     }
-    
+
+    .hidden {
+        transform: translateX(110%);
+    }
+
+    .toggle-button {
+        position: fixed;
+        top: 80px;
+        right: 10px;
+        background-color: #007BFF;
+        color: white;
+        padding: 10px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        z-index: 1001;
+    }
+
     @media (max-width: 768px) {
         .header {
             flex-direction: column;
@@ -87,8 +105,7 @@
             width: 90%;
             max-width: 300px;
             left: 50%;
-            transform: translateX(-50%);
-            top: auto;
+            transform: translateX(-50%) translateY(100%);
             bottom: 10px;
         }
     }
@@ -103,7 +120,8 @@
             <label><input type="checkbox" id="filterPS2" onchange="filtrarJuegos()"> PS2</label>
         </div>
         <div>
-            <button onclick="guardarCSV()">Guardar1</button>
+            <button class="toggle-button" onclick="toggleSeleccionados()">Mostrar/Ocultar</button>
+            <button onclick="guardarCSV()">Guardar</button>
             <button type="button" onclick="enviarCSV()">Enviar por correo</button>
         </div>
         <div class="contador">
@@ -273,7 +291,9 @@
             actualizarContador();
         }
 
-        
+        function toggleSeleccionados() {
+        document.querySelector('.seleccionados-container').classList.toggle('hidden');
+    }
 
           function actualizarContador() {
             let seleccionados = document.querySelectorAll('.item.selected');
