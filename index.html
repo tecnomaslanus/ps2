@@ -63,9 +63,48 @@
         }
         
         .catalogo-container { margin-top: 80px; }
+
+ @media (max-width: 768px) {
+            .header { flex-direction: column; gap: 10px; text-align: center; }
+            .catalogo { grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); padding: 10px; }
+            .seleccionados-container {
+                width: 100%;
+                right: 0;
+                top: 50px;
+                transform: translateY(-100%);
+            }
+            .toggle-seleccionados {
+                display: block;
+                width: 100%;
+                text-align: center;
+                padding: 10px;
+                background-color: #007BFF;
+                color: white;
+                border: none;
+                cursor: pointer;
+            }
+            .seleccionados-visible { transform: translateY(0); }
+        }
+        
     </style>
 </head>
 <body>
+  < button class="toggle-seleccionados" onclick="toggleSeleccionados()">Mostrar Juegos Seleccionados</button>
+    <div class="header">
+        <input type="text" id="busqueda" placeholder="Buscar juego..." onkeyup="filtrarJuegos()">
+        <div>
+            <button onclick="guardarCSV()">Guardar</button>
+            <button type="button" onclick="enviarCSV()">Enviar por correo</button>
+        </div>
+    </div>
+    <div class="catalogo-container">
+        <h2>Catálogo de Juegos</h2>
+        <div class="catalogo" id="catalogo"></div>
+    </div>
+    <div class="seleccionados-container" id="seleccionados">
+        <h3>Juegos Seleccionados</h3>
+        <ul id="lista-seleccionados"></ul>
+    </div>
 
     <div class="header">
         <input type="text" id="busqueda" placeholder="Buscar juego..." onkeyup="filtrarJuegos()">
@@ -74,7 +113,7 @@
             <label><input type="checkbox" id="filterPS2" onchange="filtrarJuegos()"> PS2</label>
         </div>
         <div>
-            <button onclick="guardarCSV()">Guardar1</button>
+            <button onclick="guardarCSV()">Guardarx</button>
             <button type="button" onclick="enviarCSV()">Enviar por correo</button>
         </div>
         <div class="contador">
@@ -244,6 +283,9 @@
             actualizarContador();
         }
 
+        function toggleSeleccionados() {
+            document.getElementById('seleccionados').classList.toggle('seleccionados-visible');
+        }
         
 
           function actualizarContador() {
