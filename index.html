@@ -126,7 +126,7 @@
         <div>
             <button class="toggle-button" onclick="toggleSeleccionados()">Mostrar/Ocultar</button>
 <button onclick="enviarCSV()">Enviar por correo</button>
-            <button onclick="guardarCSV()">Guardarx</button>
+            <button onclick="guardarCSV()">Guardar2</button>
             
         </div>
         <div class="contador">
@@ -288,7 +288,8 @@
             actualizarContador();
         }
 
-         function toggleSeleccionados() {
+
+ function toggleSeleccionados() {
         document.querySelector('.seleccionados-container').classList.toggle('hidden');
     }
 
@@ -337,6 +338,16 @@
         return re.test(email);
     }
 
+
+
+
+
+
+
+
+
+
+        
           function actualizarContador() {
             let seleccionados = document.querySelectorAll('.item.selected');
             document.getElementById('contador').textContent = seleccionados.length;
