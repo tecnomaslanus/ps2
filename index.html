@@ -1,298 +1,163 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Catálogo de Juegos</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
-
-    <style>
-        <!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Catálogo de Juegos</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
-    <style>
-        body { font-family: Arial, sans-serif; text-align: center; margin: 0; padding: 0; }
-        .header {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px;
-            background-color: #f4f4f4;
-            position: fixed;
-            top: 0;
-            width: 100%;
-            z-index: 1000;
-        }
-        .catalogo-container { margin-top: 80px; padding: 10px; }
-        .catalogo {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 10px;
-            justify-content: center;
-            max-width: 1050px;
-            margin: auto;
-        }
-        .item {
-            cursor: pointer;
-            padding: 10px;
-            border: 2px solid #ccc;
-            border-radius: 8px;
-            text-align: center;
-            background: #fff;
-        }
-        .item img { width: 100%; border-radius: 8px; }
-        .selected { border-color: #007BFF; background-color: #E6F0FF; }
-        input, button { padding: 8px; width: 90%; margin-top: 10px; }
-        .seleccionados-container {
-            position: fixed;
-            top: 80px;
-            right: 10px;
-            width: 250px;
-            background-color: #f4f4f4;
-            padding: 10px;
-            border-radius: 8px;
-            max-height: 80vh;
-            overflow-y: auto;
-            box-shadow: -2px 2px 10px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease-in-out;
-        }
-        .toggle-seleccionados { display: none; }
-        
-        @media (max-width: 768px) {
-            .header { flex-direction: column; gap: 10px; text-align: center; }
-            .catalogo { grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); padding: 10px; }
-            .seleccionados-container {
-                width: 100%;
-                right: 0;
-                top: 50px;
-                transform: translateY(-100%);
-            }
-            .toggle-seleccionados {
-                display: block;
-                width: 100%;
-                text-align: center;
-                padding: 10px;
-                background-color: #007BFF;
-                color: white;
-                border: none;
-                cursor: pointer;
-            }
-            .seleccionados-visible { transform: translateY(0); }
-        }
-    </style>
-</head>
-<body>
- <button class="toggle-seleccionados" onclick="toggleSeleccionados()">Mostrar Juegos Seleccionados</button>
-    <div class="header">
-        <input type="text" id="busqueda" placeholder="Buscar juego..." onkeyup="filtrarJuegos()">
-        <div>
-            <button onclick="guardarCSV()">Guardar</button>
-            <button type="button" onclick="enviarCSV()">Enviar por correo</button>
-        </div>
-    </div>
-    <div class="catalogo-container">
-        <h2>Catálogo de Juegos</h2>
-        <div class="catalogo" id="catalogo"></div>
-    </div>
-    <div class="seleccionados-container" id="seleccionados">
-        <h3>Juegos Seleccionados</h3>
-        <ul id="lista-seleccionados"></ul>
-    </div>
-
-    <div class="header">
-        <input type="text" id="busqueda" placeholder="Buscar juego..." onkeyup="filtrarJuegos()">
-<div class="filters">
-            <label><input type="checkbox" id="filterPS1" onchange="filtrarJuegos()"> PS1</label>
-            <label><input type="checkbox" id="filterPS2" onchange="filtrarJuegos()"> PS2</label>
-        </div>
-        <div>
-            <button onclick="guardarCSV()">Guardar1</button>
-            <button type="button" onclick="enviarCSV()">Enviar por correo</button>
-        </div>
-        <div class="contador">
-            Juegos seleccionados: <span id="contador">0</span>
-        </div>
-    </div>
-
-    <div class="catalogo-container">
-        <h2>Catálogo de Juegos</h2>
-        <div class="catalogo" id="catalogo"></div>
-    </div>
- <div class="seleccionados-container">
-        <h3>Juegos Seleccionados</h3>
-        <ul id="lista-seleccionados"></ul>
-    </div>
+<style>
+    body {
+        font-family: Nunito, sans-serif;
+        text-align: center;
+        margin: 0;
+        padding: 0;
+        background-image: url('https://raw.githubusercontent.com/tecnomaslanus/ps2/main/imagenes/fondo.jpg');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+    }
     
-
-    <script>
-       function cargarCatalogo() {
-    fetch('list.csv')
-        .then(response => response.text())
-        .then(data => {
-            let juegos = data.split('\n');
-            juegos.forEach((juego, index) => {
-                if (index > 0 && juego.trim() !== '') {
-                    let partes = juego.split(',');
-                    let nombre = partes[0]?.trim() || "Desconocido";
-                    let codigo = partes[1]?.trim() || "000";
-                    let tipo = partes[2]?.trim() || "Desconocido"; // CD = PS1, DVD = PS2
-
-                    console.log(`Juego cargado: ${nombre} - Tipo: ${tipo}`); // 🛠️ DEBUG
-
-                    let item = document.createElement('div');
-                    item.classList.add('item');
-                    item.setAttribute('data-nombre', nombre);
-                    item.setAttribute('data-tipo', tipo); // ✅ Agregamos el tipo
-
-                    let img = document.createElement('img');
-                    img.src = `https://raw.githubusercontent.com/tecnomaslanus/ps2/main/img/${codigo}_COV.jpg`;
-                    img.onerror = () => {
-                        img.src = `https://raw.githubusercontent.com/tecnomaslanus/ps2/main/img/${codigo}_COV.png`;
-                        img.onerror = () => {
-                            img.src = `https://raw.githubusercontent.com/tecnomaslanus/ps2/main/img2/${codigo}_COV.jpg`;
-                            img.onerror = () => {
-                                img.src = `https://raw.githubusercontent.com/tecnomaslanus/ps2/main/img2/${codigo}_COV.png`;
-                                img.onerror = () => {
-                                    img.src = `https://raw.githubusercontent.com/tecnomaslanus/ps2/main/img2/default.jpg`;
-                                };
-                            };
-                        };
-                    };
-
-                    let p = document.createElement('p');
-                    p.textContent = nombre;
-
-                    item.appendChild(img);
-                    item.appendChild(p);
-                    document.getElementById('catalogo').appendChild(item);
-                }
-            });
-
-            document.querySelectorAll('.item').forEach(item => {
-                item.addEventListener('click', () => {
-                    item.classList.toggle('selected');
-                    actualizarContador();
-                });
-            });
-        })
-        .catch(error => console.error('Error al cargar el CSV:', error));
-}
-
-
-   function guardarCSV() {
-            let seleccionados = document.querySelectorAll('.item.selected');
-            let nombres = Array.from(seleccionados).map(item => item.getAttribute('data-nombre'));
-            
-            if (nombres.length === 0) {
-                alert("Seleccioná al menos un juego.");
-                return;
-            }
-
-            let csvContent = "data:text/csv;charset=utf-8," + nombres.join("\n");
-            let blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-            saveAs(blob, "juegos_seleccionados.csv");
-        }
-
-
-  function actualizarListaSeleccionados() {
-            let lista = document.getElementById("lista-seleccionados");
-            lista.innerHTML = "";
-            document.querySelectorAll(".item.selected").forEach(item => {
-                let nombre = item.getAttribute("data-nombre");
-                let li = document.createElement("li");
-                let checkbox = document.createElement("input");
-                checkbox.type = "checkbox";
-                checkbox.checked = true;
-                checkbox.onclick = () => deseleccionarJuego(nombre);
-                li.appendChild(checkbox);
-                li.appendChild(document.createTextNode(" " + nombre));
-                lista.appendChild(li);
-            });
-        }
-        
-
-
-        async function enviarCSV() {
-    let seleccionados = document.querySelectorAll('.item.selected');
-    let nombres = Array.from(seleccionados).map(item => item.getAttribute('data-nombre'));
-
-    if (nombres.length === 0) {
-        alert("Seleccioná al menos un juego.");
-        return;
+    .header {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px;
+        background-color: #f4f4f4;
+        position: fixed;
+        top: 0;
+        width: 100%;
+        z-index: 1000;
+    }
+    
+    .catalogo {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 10px;
+        padding: 10px;
+        margin-top: 80px;
+    }
+    
+    .item {
+        cursor: pointer;
+        padding: 10px;
+        border: 2px solid #ccc;
+        border-radius: 8px;
+        background-color: #fff;
+        text-align: center;
+    }
+    
+    .item img {
+        width: 100%;
+        max-width: 120px;
+        border-radius: 8px;
+    }
+    
+    .seleccionados-container {
+        position: fixed;
+        top: 80px;
+        right: 10px;
+        width: 250px;
+        background-color: #f4f4f4;
+        padding: 10px;
+        border-radius: 8px;
+        max-height: 80vh;
+        overflow-y: auto;
+        box-shadow: -2px 2px 10px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease-in-out;
     }
 
-    let juegosSeleccionados = nombres.join("\n"); // Unir los nombres de los juegos seleccionados en un solo texto
+    .hidden {
+        transform: translateX(110%);
+    }
 
-    let emailAddress = "usuario@email.com";  // 📌 PONER EL EMAIL AQUÍ
-    // Reemplaza con la URL de tu Formulario de Google
-    let formUrl = "https://docs.google.com/forms/d/e/1FAIpQLSeZ-FcR37MdgkUqVe4mqZrYdnSXLcy7qI9JqYpEegrECPTnjw/formResponse";
+    .toggle-button {
+        position: fixed;
+        top: 80px;
+        right: 10px;
+        background-color: #007BFF;
+        color: white;
+        padding: 10px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        z-index: 1001;
+    }
 
-           
-
-    let formData = new URLSearchParams();
-    formData.append("entry.331571541", juegosSeleccionados);  // 📌 El dato que vas a enviar
-    formData.append("emailAddress", emailAddress);  // 📌 Agregar el email obligatorio
-
-    fetch(formUrl, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
-        },
-        body: formData.toString(),
-        mode: "no-cors"
-    })
-    .then(() => alert("Datos enviados correctamente"))
-    .catch(error => console.error("Error:", error));
-}
-
-     function filtrarJuegos() {
-    let input = document.getElementById("busqueda").value.toLowerCase();
-    let filterPS1 = document.getElementById("filterPS1").checked;
-    let filterPS2 = document.getElementById("filterPS2").checked;
-    let items = document.querySelectorAll(".item");
-
-    console.log(`Filtro activado: PS1=${filterPS1}, PS2=${filterPS2}`); // 🛠️ DEBUG
-
-    items.forEach(item => {
-        let nombre = item.getAttribute("data-nombre").toLowerCase();
-        let tipo = item.getAttribute("data-tipo"); // 📌 Ahora debería existir correctamente
-
-        console.log(`Analizando: ${nombre} - Tipo: ${tipo}`); // 🛠️ DEBUG
-
-        let matchTexto = nombre.includes(input);
-        let matchFiltro = (!filterPS1 && !filterPS2) || 
-                          (filterPS1 && tipo === "CD") || 
-                          (filterPS2 && tipo === "DVD");
-
-        item.style.display = matchTexto && matchFiltro ? "block" : "none";
-    });
-}
-        function deseleccionarJuego(nombre) {
-            document.querySelectorAll('.item.selected').forEach(item => {
-                if (item.getAttribute('data-nombre') === nombre) {
-                    item.classList.remove('selected');
-                }
-            });
-            actualizarContador();
-        }
-
-        function toggleSeleccionados() {
-            document.getElementById('seleccionados').classList.toggle('seleccionados-visible');
+    @media (max-width: 768px) {
+        .header {
+            flex-direction: column;
+            gap: 10px;
+            text-align: center;
         }
         
-
-          function actualizarContador() {
-            let seleccionados = document.querySelectorAll('.item.selected');
-            document.getElementById('contador').textContent = seleccionados.length;
-            actualizarListaSeleccionados();
+        .catalogo {
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
         }
+        
+        .item img {
+            max-width: 100px;
+        }
+        
+        .seleccionados-container {
+            width: 90%;
+            max-width: 300px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100%);
+            bottom: 10px;
+        }
+    }
+</style>
 
-        window.onload = cargarCatalogo;
-    </script>
-</body>
-</html>
+<!-- Agregamos inputs para nombre y correo -->
+<div>
+    <input type="text" id="nombre" placeholder="Tu nombre">
+    <input type="email" id="email" placeholder="Tu correo electrónico">
+</div>
+<button class="toggle-button" onclick="toggleSeleccionados()">Mostrar/Ocultar</button>
+<button onclick="enviarCSV()">Enviar por correo</button>
+
+<script>
+    function toggleSeleccionados() {
+        document.querySelector('.seleccionados-container').classList.toggle('hidden');
+    }
+
+    function enviarCSV() {
+        let seleccionados = document.querySelectorAll('.item.selected');
+        let nombres = Array.from(seleccionados).map(item => item.getAttribute('data-nombre'));
+        
+        if (nombres.length === 0) {
+            alert("Seleccioná al menos un juego.");
+            return;
+        }
+        
+        let juegosSeleccionados = nombres.join("\n");
+        let nombreUsuario = document.getElementById("nombre").value.trim();
+        let emailAddress = document.getElementById("email").value.trim();
+        
+        if (!nombreUsuario || !emailAddress) {
+            alert("Por favor, ingresá tu nombre y correo electrónico.");
+            return;
+        }
+        
+        if (!validateEmail(emailAddress)) {
+            alert("Por favor, ingresá un correo electrónico válido.");
+            return;
+        }
+        
+        let formUrl = "https://docs.google.com/forms/d/e/1FAIpQLSeZ-FcR37MdgkUqVe4mqZrYdnSXLcy7qI9JqYpEegrECPTnjw/formResponse";
+        
+        let formData = new URLSearchParams();
+        formData.append("entry.331571541", juegosSeleccionados);
+        formData.append("entry.123456789", nombreUsuario); // Reemplazar con el campo real del formulario
+        formData.append("emailAddress", emailAddress);
+        
+        fetch(formUrl, {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: formData.toString(),
+            mode: "no-cors"
+        })
+        .then(() => alert("Datos enviados correctamente"))
+        .catch(error => console.error("Error:", error));
+    }
+
+    function validateEmail(email) {
+        let re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return re.test(email);
+    }
+</script>
