@@ -126,7 +126,7 @@
         <div>
             <button class="toggle-button" onclick="toggleSeleccionados()">Mostrar/Ocultar</button>
 <button onclick="enviarCSV()">Enviar por correo</button>
-            <button onclick="guardarCSV()">Guardar3</button>
+            <button onclick="guardarCSV()">Guardar2</button>
             
         </div>
         <div class="contador">
@@ -237,7 +237,54 @@
             document.getElementById('contador').textContent = seleccionados.length;
             actualizarListaSeleccionados();
         }
+ function toggleSeleccionados() {
+        document.querySelector('.seleccionados-container').classList.toggle('hidden');
+    }
 
+    function enviarCSV() {
+        let seleccionados = document.querySelectorAll('.item.selected');
+        let nombres = Array.from(seleccionados).map(item => item.getAttribute('data-nombre'));
+        
+        if (nombres.length === 0) {
+            alert("Seleccioná al menos un juego.");
+            return;
+        }
+        
+        let juegosSeleccionados = nombres.join("\n");
+        let nombreUsuario = document.getElementById("nombre").value.trim();
+        let emailAddress = document.getElementById("email").value.trim();
+        
+        if (!nombreUsuario || !emailAddress) {
+            alert("Por favor, ingresá tu nombre y correo electrónico.");
+            return;
+        }
+        
+        if (!validateEmail(emailAddress)) {
+            alert("Por favor, ingresá un correo electrónico válido.");
+            return;
+        }
+        
+        let formUrl = "https://docs.google.com/forms/d/e/1FAIpQLSeZ-FcR37MdgkUqVe4mqZrYdnSXLcy7qI9JqYpEegrECPTnjw/formResponse";
+        
+        let formData = new URLSearchParams();
+        formData.append("entry.331571541", juegosSeleccionados);
+        formData.append("entry.123456789", nombreUsuario); // Reemplazar con el campo real del formulario
+        formData.append("emailAddress", emailAddress);
+        
+        fetch(formUrl, {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: formData.toString(),
+            mode: "no-cors"
+        })
+        .then(() => alert("Datos enviados correctamente"))
+        .catch(error => console.error("Error:", error));
+    }
+
+    function validateEmail(email) {
+        let re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return re.test(email);
+    }
         window.onload = cargarCatalogo;
     </script>
 </body>
