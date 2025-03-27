@@ -113,12 +113,11 @@
 
 </head>
 <body>
-    <div>
-    <input type="text" id="nombre" placeholder="Tu nombre">
-    <input type="email" id="email" placeholder="Tu correo electrónico">
-</div>
+  
     <div class="header">
         <input type="text" id="busqueda" placeholder="Buscar juego..." onkeyup="filtrarJuegos()">
+            <input type="text" id="nombre" placeholder="Tu nombre">
+    <input type="email" id="email" placeholder="Tu correo electrónico">
 <div class="filters">
             <label><input type="checkbox" id="filterPS1" onchange="filtrarJuegos()"> PS1</label>
             <label><input type="checkbox" id="filterPS2" onchange="filtrarJuegos()"> PS2</label>
@@ -126,7 +125,7 @@
         <div>
             <button class="toggle-button" onclick="toggleSeleccionados()">Mostrar/Ocultar</button>
 <button onclick="enviarCSV()">Enviar por correo</button>
-            <button onclick="guardarCSV()">Guardar2</button>
+            <button onclick="guardarCSV()">Guardar3</button>
             
         </div>
         <div class="contador">
@@ -197,7 +196,21 @@
         })
         .catch(error => console.error('Error al cargar el CSV:', error));
 }
-
+function actualizarListaSeleccionados() {
+            let lista = document.getElementById("lista-seleccionados");
+            lista.innerHTML = "";
+            document.querySelectorAll(".item.selected").forEach(item => {
+                let nombre = item.getAttribute("data-nombre");
+                let li = document.createElement("li");
+                let checkbox = document.createElement("input");
+                checkbox.type = "checkbox";
+                checkbox.checked = true;
+                checkbox.onclick = () => deseleccionarJuego(nombre);
+                li.appendChild(checkbox);
+                li.appendChild(document.createTextNode(" " + nombre));
+                lista.appendChild(li);
+            });
+        }
 
      function filtrarJuegos() {
     let input = document.getElementById("busqueda").value.toLowerCase();
