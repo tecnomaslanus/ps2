@@ -108,71 +108,82 @@
     
     <div class="header">
         <input type="text" id="busqueda" placeholder="Buscar juego..." onkeyup="filtrarJuegos()">
-        <div class="filters">
+<div class="filters">
             <label><input type="checkbox" id="filterPS1" onchange="filtrarJuegos()"> PS1</label>
             <label><input type="checkbox" id="filterPS2" onchange="filtrarJuegos()"> PS2</label>
         </div>
-        <div class="controls">
-            <button onclick="guardarCSV()">Guardar2</button>
-            <button onclick="enviarCSV()">Enviar</button>
+        <div>
+            <button onclick="guardarCSV()">Guardar</button>
+            <button type="button" onclick="enviarCSV()">Enviar por correo</button>
         </div>
-        <div class="contador">Juegos seleccionados: <span id="contador">0</span></div>
+        <div class="contador">
+            Juegos seleccionados: <span id="contador">0</span>
+        </div>
     </div>
-    
-    <button class="toggle-btn" onclick="toggleSeleccionados()">📋</button>
-    
-    <div class="seleccionados-container" id="seleccionados">
-        <h3>Juegos Seleccionados</h3>
-        <ul id="lista-seleccionados"></ul>
-    </div>
-    
+
     <div class="catalogo-container">
         <h2>Catálogo de Juegos</h2>
         <div class="catalogo" id="catalogo"></div>
     </div>
+ <div class="seleccionados-container">
+        <h3>Juegos Seleccionados</h3>
+        <ul id="lista-seleccionados"></ul>
+    </div>
+    
+
     <script>
-         function toggleSeleccionados() {
-            document.getElementById('seleccionados').classList.toggle('active');
-        }
-        function cargarCatalogo() {
-            fetch('list.csv')
-                .then(response => response.text())
-                .then(data => {
-                    let juegos = data.split('\n');
-                    juegos.forEach((juego, index) => {
-                        if (index > 0 && juego.trim() !== '') {
-                            let partes = juego.split(',');
-                            let nombre = partes[0]?.trim() || "Desconocido";
-                            let codigo = partes[1]?.trim() || "000";
-                            let tipo = partes[2]?.trim() || "Desconocido";
+       function cargarCatalogo() {
+    fetch('list.csv')
+        .then(response => response.text())
+        .then(data => {
+            let juegos = data.split('\n');
+            juegos.forEach((juego, index) => {
+                if (index > 0 && juego.trim() !== '') {
+                    let partes = juego.split(',');
+                    let nombre = partes[0]?.trim() || "Desconocido";
+                    let codigo = partes[1]?.trim() || "000";
+                    let tipo = partes[2]?.trim() || "Desconocido"; // CD = PS1, DVD = PS2
 
-                            let item = document.createElement('div');
-                            item.classList.add('item');
-                            item.setAttribute('data-nombre', nombre);
-                            item.setAttribute('data-tipo', tipo);
+                    console.log(`Juego cargado: ${nombre} - Tipo: ${tipo}`); // 🛠️ DEBUG
 
-                            let img = document.createElement('img');
-                            img.src = `https://raw.githubusercontent.com/tecnomaslanus/ps2/main/img/${codigo}_COV.jpg`;
-                            let p = document.createElement('p');
-                            p.textContent = nombre;
+                    let item = document.createElement('div');
+                    item.classList.add('item');
+                    item.setAttribute('data-nombre', nombre);
+                    item.setAttribute('data-tipo', tipo); // ✅ Agregamos el tipo
 
-                            item.appendChild(img);
-                            item.appendChild(p);
-                            document.getElementById('catalogo').appendChild(item);
+                    let img = document.createElement('img');
+                    img.src = `https://raw.githubusercontent.com/tecnomaslanus/ps2/main/img/${codigo}_COV.jpg`;
+                    img.onerror = () => {
+                        img.src = `https://raw.githubusercontent.com/tecnomaslanus/ps2/main/img/${codigo}_COV.png`;
+                        img.onerror = () => {
+                            img.src = `https://raw.githubusercontent.com/tecnomaslanus/ps2/main/img2/${codigo}_COV.jpg`;
+                            img.onerror = () => {
+                                img.src = `https://raw.githubusercontent.com/tecnomaslanus/ps2/main/img2/${codigo}_COV.png`;
+                                img.onerror = () => {
+                                    img.src = `https://raw.githubusercontent.com/tecnomaslanus/ps2/main/img2/default.jpg`;
+                                };
+                            };
+                        };
+                    };
 
-                            item.addEventListener('click', () => {
-                                item.classList.toggle('selected');
-                                actualizarContador();
-                            });
-                        }
-                    });
-                })
-                .catch(error => console.error('Error al cargar el CSV:', error));
-        }
-        function actualizarContador() {
-            let seleccionados = document.querySelectorAll('.item.selected');
-            document.getElementById('contador').textContent = seleccionados.length;
-        }
+                    let p = document.createElement('p');
+                    p.textContent = nombre;
+
+                    item.appendChild(img);
+                    item.appendChild(p);
+                    document.getElementById('catalogo').appendChild(item);
+                }
+            });
+
+            document.querySelectorAll('.item').forEach(item => {
+                item.addEventListener('click', () => {
+                    item.classList.toggle('selected');
+                    actualizarContador();
+                });
+            });
+        })
+        .catch(error => console.error('Error al cargar el CSV:', error));
+}
 
 
    function guardarCSV() {
@@ -274,7 +285,11 @@
 
         
 
-        
+          function actualizarContador() {
+            let seleccionados = document.querySelectorAll('.item.selected');
+            document.getElementById('contador').textContent = seleccionados.length;
+            actualizarListaSeleccionados();
+        }
 
         window.onload = cargarCatalogo;
     </script>
