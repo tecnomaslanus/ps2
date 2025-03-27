@@ -126,7 +126,7 @@
         <div>
             <button class="toggle-button" onclick="toggleSeleccionados()">Mostrar/Ocultar</button>
 <button onclick="enviarCSV()">Enviar por correo</button>
-            <button onclick="guardarCSV()">Guardar2</button>
+            <button onclick="guardarCSV()">Guardar3</button>
             
         </div>
         <div class="contador">
@@ -199,64 +199,6 @@
 }
 
 
-   function guardarCSV() {
-            let seleccionados = document.querySelectorAll('.item.selected');
-            let nombres = Array.from(seleccionados).map(item => item.getAttribute('data-nombre'));
-            
-            if (nombres.length === 0) {
-                alert("Seleccioná al menos un juego.");
-                return;
-            }
-
-            let csvContent = "data:text/csv;charset=utf-8," + nombres.join("\n");
-            let blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-            saveAs(blob, "juegos_seleccionados.csv");
-        }
-
-
-  function actualizarListaSeleccionados() {
-            let lista = document.getElementById("lista-seleccionados");
-            lista.innerHTML = "";
-            document.querySelectorAll(".item.selected").forEach(item => {
-                let nombre = item.getAttribute("data-nombre");
-                let li = document.createElement("li");
-                let checkbox = document.createElement("input");
-                checkbox.type = "checkbox";
-                checkbox.checked = true;
-                checkbox.onclick = () => deseleccionarJuego(nombre);
-                li.appendChild(checkbox);
-                li.appendChild(document.createTextNode(" " + nombre));
-                lista.appendChild(li);
-            });
-        }
-        
-
-
-     
-    let juegosSeleccionados = nombres.join("\n"); // Unir los nombres de los juegos seleccionados en un solo texto
-
-    let emailAddress = "usuario@email.com";  // 📌 PONER EL EMAIL AQUÍ
-    // Reemplaza con la URL de tu Formulario de Google
-    let formUrl = "https://docs.google.com/forms/d/e/1FAIpQLSeZ-FcR37MdgkUqVe4mqZrYdnSXLcy7qI9JqYpEegrECPTnjw/formResponse";
-
-           
-
-    let formData = new URLSearchParams();
-    formData.append("entry.331571541", juegosSeleccionados);  // 📌 El dato que vas a enviar
-    formData.append("emailAddress", emailAddress);  // 📌 Agregar el email obligatorio
-
-    fetch(formUrl, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
-        },
-        body: formData.toString(),
-        mode: "no-cors"
-    })
-    .then(() => alert("Datos enviados correctamente"))
-    .catch(error => console.error("Error:", error));
-}
-
      function filtrarJuegos() {
     let input = document.getElementById("busqueda").value.toLowerCase();
     let filterPS1 = document.getElementById("filterPS1").checked;
@@ -289,65 +231,7 @@
         }
 
 
- function toggleSeleccionados() {
-        document.querySelector('.seleccionados-container').classList.toggle('hidden');
-    }
-
-    function enviarCSV() {
-        let seleccionados = document.querySelectorAll('.item.selected');
-        let nombres = Array.from(seleccionados).map(item => item.getAttribute('data-nombre'));
-        
-        if (nombres.length === 0) {
-            alert("Seleccioná al menos un juego.");
-            return;
-        }
-        
-        let juegosSeleccionados = nombres.join("\n");
-        let nombreUsuario = document.getElementById("nombre").value.trim();
-        let emailAddress = document.getElementById("email").value.trim();
-        
-        if (!nombreUsuario || !emailAddress) {
-            alert("Por favor, ingresá tu nombre y correo electrónico.");
-            return;
-        }
-        
-        if (!validateEmail(emailAddress)) {
-            alert("Por favor, ingresá un correo electrónico válido.");
-            return;
-        }
-        
-        let formUrl = "https://docs.google.com/forms/d/e/1FAIpQLSeZ-FcR37MdgkUqVe4mqZrYdnSXLcy7qI9JqYpEegrECPTnjw/formResponse";
-        
-        let formData = new URLSearchParams();
-        formData.append("entry.331571541", juegosSeleccionados);
-        formData.append("entry.123456789", nombreUsuario); // Reemplazar con el campo real del formulario
-        formData.append("emailAddress", emailAddress);
-        
-        fetch(formUrl, {
-            method: "POST",
-            headers: { "Content-Type": "application/x-www-form-urlencoded" },
-            body: formData.toString(),
-            mode: "no-cors"
-        })
-        .then(() => alert("Datos enviados correctamente"))
-        .catch(error => console.error("Error:", error));
-    }
-
-    function validateEmail(email) {
-        let re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        return re.test(email);
-    }
-
-
-
-
-
-
-
-
-
-
-        
+      
           function actualizarContador() {
             let seleccionados = document.querySelectorAll('.item.selected');
             document.getElementById('contador').textContent = seleccionados.length;
